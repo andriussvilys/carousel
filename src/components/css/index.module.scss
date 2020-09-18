@@ -1,6 +1,3 @@
-*{
-    box-sizing: border-box;
-}
 .container{
     background: yellow;
     height: 40%;
@@ -22,4 +19,7 @@
 }
 .slide{
     border: 1px solid blue;
+    img{
+        height: 100%;
+    }
 }

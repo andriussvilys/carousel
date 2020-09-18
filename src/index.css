@@ -1,0 +1,50 @@
+* {
+	box-sizing: border-box;
+}
+
+#root,
+.App,
+body,
+html {
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.smoothSlide {
+	transition: transform .2s;
+}
+
+.fams {
+	padding: 20px;
+	height: 60%;
+	display: grid;
+    grid-template-rows: 50% 50%;
+}
+
+.famContainer {
+	margin-left: 10px;
+	height: 50%;
+}
+
+.famImages {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid;
+	height: 100%;
+	padding: 10px;
+}
+
+.imgWrapper {
+	height: 100%;
+	flex: 1 1;
+}
+
+.famImages img {
+	margin: 3px;
+	height: 100%;
+	width: 100%;
+	object-fit: contain;
+}
