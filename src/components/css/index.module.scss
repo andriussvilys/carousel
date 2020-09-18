@@ -1,0 +1,25 @@
+.container{
+    background: yellow;
+    height: 40%;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    touch-action: pan-y;
+
+}
+.slideContainer{
+    top: 0;
+    left: 0;
+    position: absolute;
+    height: 50%;
+    border: 1px solid;
+    display: flex;
+    touch-action: pan-y;
+    background-color: white;
+}
+.slide{
+    border: 1px solid blue;
+    img{
+        height: 100%;
+    }
+}
