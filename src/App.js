@@ -20,6 +20,14 @@ const App = props => {
     {
       src: "./images/sparkle-4.png",
       index: 3
+    },
+    {
+      src: "./images/long.jpg",
+      index: 4
+    },
+    {
+      src: "./images/tall.png",
+      index: 5
     }],
 
     spring: [{
