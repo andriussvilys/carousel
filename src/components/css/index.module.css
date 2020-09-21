@@ -1,0 +1,61 @@
+.container {
+  background: yellow;
+  height: 40%;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  -ms-touch-action: pan-y;
+      touch-action: pan-y;
+  margin-top: 200px;
+  margin-left: 50px;
+}
+
+.slideContainer {
+  top: 0;
+  left: 0;
+  position: absolute;
+  height: 90%;
+  border: 1px solid;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-touch-action: pan-y;
+      touch-action: pan-y;
+  background-color: white;
+}
+
+.slide {
+  border: 1px solid blue;
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  overflow: hidden;
+}
+
+.slide img {
+  position: absolute;
+  height: 100%;
+}
+
+.slideInView {
+  background-color: red;
+}
+
+.button_zoom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.zoomedIn {
+  -webkit-transform: scale(2);
+          transform: scale(2);
+}
+/*# sourceMappingURL=index.module.css.map */

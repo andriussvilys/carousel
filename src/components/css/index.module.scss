@@ -6,12 +6,14 @@
     overflow: hidden;
     touch-action: pan-y;
 
+    margin-top: 200px;
+    margin-left: 50px;
 }
 .slideContainer{
     top: 0;
     left: 0;
     position: absolute;
-    height: 50%;
+    height: 90%;
     border: 1px solid;
     display: flex;
     touch-action: pan-y;
@@ -19,7 +21,24 @@
 }
 .slide{
     border: 1px solid blue;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
     img{
+        position: absolute;
         height: 100%;
     }
+}
+.slideInView{
+    background-color: red;
+}
+.button_zoom{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+.zoomedIn{
+    transform: scale(2);
 }
