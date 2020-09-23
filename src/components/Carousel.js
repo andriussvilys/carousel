@@ -25,21 +25,6 @@ const Carousel = props => {
 
         const startHandle = (e) => {
             e.preventDefault();
-
-            // if(cursorPosition.zoom.zoomedIn){
-            //   const container = document.querySelector(`.${styles.container}`)
-            //   const offset = {y: container.getBoundingClientRect().top, x: container.getBoundingClientRect().left}
-            //   const startX = e.touches ? e.touches[0].pageX - offset.x : e.pageX - offset.x
-            //   const startY = e.touches ? e.touches[0].pageY - offset.y : e.pageY - offset.y
-            //     return setCursorPosition({
-            //         ...cursorPosition,
-            //         zoom: {
-            //             ...cursorPosition.zoom,
-            //             startX, 
-            //             startY
-            //         }
-            //     })
-            // }
             const container = document.querySelector(`.${styles.container}`)
             document.querySelector(`.${styles.slideContainer}`).classList.remove("smoothSlide");
             const left = e.touches ? e.touches[0].pageX: e.pageX;
@@ -75,7 +60,6 @@ const Carousel = props => {
             const zoomedImage = zoomRef.current
               const container = document.querySelector(`.${styles.container}`)
               const offset = {y: container.getBoundingClientRect().y, x: container.getBoundingClientRect().x, top: container.getBoundingClientRect().top}
-              console.log({y: offset.y})
 
               
               const imgToSlideHeightRatio = zoomedImage.clientHeight * 100 / slideContainer.clientHeight
@@ -87,8 +71,6 @@ const Carousel = props => {
               let y = e.touches ? e.touches[0].clientY - offset.y : e.clientY - offset.y;
               let moveY = y - middleGuideY
               let panY = (moveY * marginY / middleGuideY).toFixed(2)
-
-              console.log({panY, y, middleGuideY, offsetY: offset.y, offsetTop: offset.top})
 
               const visibleSectionX = imgToSlideWidthRatio / cursorPosition.zoom.zoomPower
               const marginX = ((100 - visibleSectionX) / 2) + 10
@@ -112,7 +94,7 @@ const Carousel = props => {
               const x = e.touches ? e.touches[0].pageX: e.pageX
               var walk = 100 * (cursorPosition.startX - x) / slideContainer.clientWidth;
               var transform = walk + cursorPosition.prevTransform;
-              
+
               var direction = walk > 0 ? 1: -1;
               setCursorPosition({
                 ...cursorPosition,
@@ -124,7 +106,6 @@ const Carousel = props => {
           var endHandle = () => {
               if(cursorPosition.zoom.zoomedIn){ return document.querySelector("body").classList.remove(styles.disableBodyScroll) }
               if(!cursorPosition.isDown)return
-              console.log("END HANDLE")
             document.querySelector(`.${styles.slideContainer}`).classList.add("smoothSlide");
             var positionFix = cursorPosition.transform;
             
@@ -144,11 +125,8 @@ const Carousel = props => {
             index = cursorPosition.currentSlide + cursorPosition.direction;
                 if(index < 0){index = 0}
                 if(index > slideCount - 1){index = slideCount -1 }
-                console.log({currentSlide: cursorPosition.currentSlide, nextIndex: index})
                 positionFix = (index) * (100 / slideCount);
             }
-
-            // console.log(`%c ${positionFix}`, 'background: #222; color: #bada55')
             setCursorPosition({
             ...cursorPosition,
             isDown: false,
@@ -166,12 +144,6 @@ const Carousel = props => {
                 ref={cursorPosition.currentSlide === image.index ? currentSlideRef : null }
                 key={`${image}-${index}`}
                 style={{width: `${100 / props.images.length}%`}}
-                onMouseMove={(e) => {
-                    // console.log(`%c slideY: ${e.pageY}`, "color: blue")
-                    // console.log(`%c offsetTop: ${e.target.offsetTop}`, "color: blue")
-                    // console.log("_____________-------")
-                }}
-                // style={cursorPosition.zoomedIn ? {left: zoomPosition.x, top: zoomPosition.y} : {}}
                 >
                     <img 
                         className={`
@@ -209,7 +181,6 @@ const Carousel = props => {
                     startY: null,
                 }
             })
-            console.log(cursorPosition)
           }, [props])
 
     return(
@@ -219,7 +190,7 @@ const Carousel = props => {
                 className={styles.slideContainer}
                 style={{
                     width: `${100 * props.images.length}%`,
-                    transform: `translateX(-${cursorPosition.transform}%)`
+                    transform: `translateX(${-cursorPosition.transform}%)`
                 }}
                 onMouseDown={(e) => {startHandle(e)} }
                 onTouchStart={(e) => {startHandle(e)} }
