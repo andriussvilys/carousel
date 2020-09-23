@@ -2,6 +2,15 @@ import React, { useEffect } from 'react'
 import styles from './css/index.module.scss'
 
 const Carousel = props => {
+    const zoomDefault =  {
+        zoomedIn: null,
+        zoomIndex: null,
+        zoomPower: 1,
+        x: 0,
+        y: 0,
+        startX: null,
+        startY: null,
+    }
     const [cursorPosition, setCursorPosition] = React.useState({
           isDown: null,
           startX: null,
@@ -19,6 +28,33 @@ const Carousel = props => {
               startY: null,
           }
         });
+
+    const slideTo = (index) => {
+        const newTransfrom = (100 / props.images.length) * index
+        setCursorPosition({
+            ...cursorPosition,
+            currentSlide: index,
+            transform: newTransfrom,
+            prevTransform: newTransfrom,
+            zoom: {...zoomDefault}
+        })
+    }
+
+    const dots = (imageList) => {
+        if(!imageList || imageList.length < 0){return}
+
+        console.log("imagesList")
+        console.log(imageList)
+        const dots = imageList.map((image, index) => {
+            return <li 
+            onClick={() => {
+                slideTo(index)
+            }}
+            key={`carouselDot-${index}`} 
+            className={`${styles.dot} ${index === cursorPosition.currentSlide ? styles.dot_active : ""}`}></li>
+        })
+        return <ul className={styles.dotList}>{dots}</ul>
+    }
 
     const zoomRef = React.useRef(null)
     const currentSlideRef = React.useRef(null)
@@ -228,6 +264,7 @@ const Carousel = props => {
                     }
                 })
             }}>enlarge</button>
+            {dots(props.images)}
         </div>
     )
 }

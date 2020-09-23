@@ -49,3 +49,26 @@
 .zoomedIn{
     transform: scale(2);
 }
+.dotList{
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    list-style: none;
+}
+.dot{
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    background: white;
+    border: 3px solid rgb(95, 95, 95);
+    margin: 5px;
+    cursor: pointer;
+}
+.dot_active{
+    background: lime;
+}
