@@ -18,15 +18,7 @@ const Carousel = props => {
           prevTransform: props.initialTransform,
           currentSlide: props.index,
           direction: null,
-          zoom: {
-              zoomedIn: null,
-              zoomIndex: null,
-              zoomPower: 1,
-              x: 0,
-              y: 0,
-              startX: null,
-              startY: null,
-          }
+          zoom: {...zoomDefault}
         });
 
     const slideTo = (index) => {
@@ -109,7 +101,7 @@ const Carousel = props => {
               let panY = (moveY * marginY / middleGuideY).toFixed(2)
 
               const visibleSectionX = imgToSlideWidthRatio / cursorPosition.zoom.zoomPower
-              const marginX = ((100 - visibleSectionX) / 2) + 10
+              const marginX = ((100 - visibleSectionX) / 2)
               const middleGuideX = slideContainer.clientWidth / 2
               let x = e.touches ? e.touches[0].clientX - offset.x : e.clientX - offset.x
               let moveX = x - middleGuideX
@@ -207,15 +199,7 @@ const Carousel = props => {
                 transform: props.initialTransform,
                 prevTransform: props.initialTransform,
                 currentSlide: props.currentSlide,
-                zoom: {
-                    zoomedIn: null,
-                    zoomIndex: null,
-                    zoomPower: 1,
-                    x: 0,
-                    y: 0,
-                    startX: null,
-                    startY: null,
-                }
+                zoom:{...zoomDefault}
             })
           }, [props])
 
