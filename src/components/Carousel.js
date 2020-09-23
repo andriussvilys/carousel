@@ -11,6 +11,7 @@ const Carousel = props => {
           direction: null,
           zoom: {
               zoomedIn: null,
+              zoomIndex: null,
               zoomPower: 1,
               x: 0,
               y: 0,
@@ -19,7 +20,8 @@ const Carousel = props => {
           }
         });
 
-    const zoomedInSlide = React.createRef(null)
+    const zoomRef = React.useRef(null)
+    const currentSlideRef = React.useRef(null)
 
         const zoomedInMove = () => {
 
@@ -61,35 +63,39 @@ const Carousel = props => {
 
         const moveHandle = (e) => {
             if(cursorPosition.zoom.zoomedIn){
-
-              const slideContainer = document.querySelector(`.${styles.slideContainer}`)
+              e.preventDefault()
+            //   const slideContainer = document.querySelector(`.${styles.slideContainer}`)
+            const slideContainer = currentSlideRef.current
+            const zoomedImage = zoomRef.current
               const container = document.querySelector(`.${styles.container}`)
-              const offset = {y: container.getBoundingClientRect().y, x: container.getBoundingClientRect().x}
+              const offset = {y: container.getBoundingClientRect().y, x: container.getBoundingClientRect().x, top: container.getBoundingClientRect().top}
               console.log({y: offset.y})
 
-              const visibleSection = 100 / cursorPosition.zoom.zoomPower
-
-              const marginY = ((100 - visibleSection) / 2) + 10
+              
+              const imgToSlideHeightRatio = zoomedImage.clientHeight * 100 / slideContainer.clientHeight
+              const imgToSlideWidthRatio = zoomedImage.clientWidth * 100 / slideContainer.clientWidth
+              
+              const visibleSectionY = imgToSlideHeightRatio / cursorPosition.zoom.zoomPower
+              const marginY = ((100 - visibleSectionY) / 2) + 10
               const middleGuideY = slideContainer.clientHeight / 2
-              let y = e.touches ? e.touches[0].pageY - offset.y : e.pageY - offset.y
+              let y = e.touches ? e.touches[0].clientY - offset.y : e.clientY - offset.y;
               let moveY = y - middleGuideY
               let panY = (moveY * marginY / middleGuideY).toFixed(2)
 
-              const marginX = ((100 - visibleSection) / 2) + 10
-              const middleGuideX = slideContainer.clientWidth / 2
-              let x = e.touches ? e.touches[0].pageX - offset.x : e.pageY - offset.x
-              const panX = x 
-            //   let moveX = x - middleGuideX
-            //   let panX = (moveX * marginX / middleGuideX).toFixed(2)
+              console.log({panY, y, middleGuideY, offsetY: offset.y, offsetTop: offset.top})
 
-                // console.log({panY, y, middleGuideY})
-                console.log({panX, x, middleGuideX})
+              const visibleSectionX = imgToSlideWidthRatio / cursorPosition.zoom.zoomPower
+              const marginX = ((100 - visibleSectionX) / 2) + 10
+              const middleGuideX = slideContainer.clientWidth / 2
+              let x = e.touches ? e.touches[0].clientX - offset.x : e.clientX - offset.x
+              let moveX = x - middleGuideX
+              let panX = (moveX * marginX / middleGuideX).toFixed(2)
 
                 return setCursorPosition({
                     ...cursorPosition, 
                     zoom:{...cursorPosition.zoom, 
                         y:panY, 
-                        // x: panX
+                        x: panX
                     }
                 })
             }
@@ -151,18 +157,25 @@ const Carousel = props => {
             return (
                 <div
                 className={styles.slide}
+                ref={cursorPosition.currentSlide === image.index ? currentSlideRef : null }
                 key={`${image}-${index}`}
                 style={{width: `${100 / props.images.length}%`}}
+                onMouseMove={(e) => {
+                    // console.log(`%c slideY: ${e.pageY}`, "color: blue")
+                    // console.log(`%c offsetTop: ${e.target.offsetTop}`, "color: blue")
+                    // console.log("_____________-------")
+                }}
                 // style={cursorPosition.zoomedIn ? {left: zoomPosition.x, top: zoomPosition.y} : {}}
                 >
                     <img 
                         className={`
                         ${cursorPosition.currentSlide === image.index ? styles.slideInView : ""}
                         `}
+                        ref={cursorPosition.zoom.zoomedIn && cursorPosition.currentSlide === image.index ? zoomRef : null}
                         style={cursorPosition.zoom.zoomedIn ? 
                             {transform: 
                             `scale(${cursorPosition.zoom.zoomPower}) 
-                            translate(${-cursorPosition.zoom.x}%, 
+                            translate(${cursorPosition.zoom.x}%, 
                             ${cursorPosition.zoom.y}%)`} 
                             : {}}
                         src={image.src}
@@ -172,6 +185,11 @@ const Carousel = props => {
             )
             })
         }
+
+        // useEffect(() => {
+        //     console.log(`%c ZOOM REF`, "color: lime")
+        //     console.log(zoomRef.current)
+        // })
 
         useEffect(() => {
             // console.log(`%c PROPS CHANGED`, "color:red")
@@ -225,6 +243,7 @@ const Carousel = props => {
                         ...cursorPosition.zoom,
                         zoomedIn: zoom.zoomedIn,
                         zoomPower: zoom.zoomPower,
+                        zoomIndex: cursorPosition.currentSlide,
                         y: 0,
                         x: 0
                     }
