@@ -70,7 +70,6 @@ const App = props => {
                             setCurrentSlide({index: image.index, initialTransform: (100 / array.length * image.index)});
                             var slideContainer = document.getElementById("slideContainer");
                             slideContainer.classList.add("smoothSlide");
-                            // slideContainer.style.transform = `translateX(-${100 / array.length * image.index}%)`
                           }}
                       />
                     </div>

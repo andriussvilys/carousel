@@ -23,33 +23,23 @@ const Carousel = props => {
     const zoomRef = React.useRef(null)
     const currentSlideRef = React.useRef(null)
 
-        const zoomedInMove = () => {
-
-        }
-
-        const countProportion = (move, parentSize) => {
-            return move * 100 / parentSize
-          }
-
         const startHandle = (e) => {
             e.preventDefault();
-            if(cursorPosition.zoom.zoomedIn){
-              const container = document.querySelector(`.${styles.container}`)
-              const offset = {y: container.getBoundingClientRect().top, x: container.getBoundingClientRect().left}
-              const startX = e.touches ? e.touches[0].pageX - offset.x : e.pageX - offset.x
-              const startY = e.touches ? e.touches[0].pageY - offset.y : e.pageY - offset.y
-            //   console.log({pageX:  e.pageX, pageY: e.pageY})
-            //   console.log({offsetX: offset.x, offsetY: offset.y})
-            //   console.log({startX, startY})
-                return setCursorPosition({
-                    ...cursorPosition,
-                    zoom: {
-                        ...cursorPosition.zoom,
-                        startX, 
-                        startY
-                    }
-                })
-            }
+
+            // if(cursorPosition.zoom.zoomedIn){
+            //   const container = document.querySelector(`.${styles.container}`)
+            //   const offset = {y: container.getBoundingClientRect().top, x: container.getBoundingClientRect().left}
+            //   const startX = e.touches ? e.touches[0].pageX - offset.x : e.pageX - offset.x
+            //   const startY = e.touches ? e.touches[0].pageY - offset.y : e.pageY - offset.y
+            //     return setCursorPosition({
+            //         ...cursorPosition,
+            //         zoom: {
+            //             ...cursorPosition.zoom,
+            //             startX, 
+            //             startY
+            //         }
+            //     })
+            // }
             const container = document.querySelector(`.${styles.container}`)
             document.querySelector(`.${styles.slideContainer}`).classList.remove("smoothSlide");
             const left = e.touches ? e.touches[0].pageX: e.pageX;
@@ -62,8 +52,24 @@ const Carousel = props => {
           };
 
         const moveHandle = (e) => {
+            if(e.touches && e.touches.length > 1){
+                return setCursorPosition({
+                    ...cursorPosition,
+                    zoom: {
+                        ...cursorPosition.zoom,
+                        zoomPower: {
+                            zoomedIn: true,
+                            zoomPower: Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY)
+                        }
+                    }
+                })
+                
+            }
             if(cursorPosition.zoom.zoomedIn){
-              e.preventDefault()
+                e.preventDefault()
+                if(window.innerWidth < 720){
+                    document.querySelector("body").classList.add(styles.disableBodyScroll)
+                }
             //   const slideContainer = document.querySelector(`.${styles.slideContainer}`)
             const slideContainer = currentSlideRef.current
             const zoomedImage = zoomRef.current
@@ -116,7 +122,7 @@ const Carousel = props => {
           };
 
           var endHandle = () => {
-              if(cursorPosition.zoom.zoomedIn)return
+              if(cursorPosition.zoom.zoomedIn){ return document.querySelector("body").classList.remove(styles.disableBodyScroll) }
               if(!cursorPosition.isDown)return
               console.log("END HANDLE")
             document.querySelector(`.${styles.slideContainer}`).classList.add("smoothSlide");
@@ -186,19 +192,22 @@ const Carousel = props => {
             })
         }
 
-        // useEffect(() => {
-        //     console.log(`%c ZOOM REF`, "color: lime")
-        //     console.log(zoomRef.current)
-        // })
-
         useEffect(() => {
-            // console.log(`%c PROPS CHANGED`, "color:red")
             setCursorPosition({
                 ...cursorPosition,
                 direction: null,
                 transform: props.initialTransform,
                 prevTransform: props.initialTransform,
-                currentSlide: props.currentSlide
+                currentSlide: props.currentSlide,
+                zoom: {
+                    zoomedIn: null,
+                    zoomIndex: null,
+                    zoomPower: 1,
+                    x: 0,
+                    y: 0,
+                    startX: null,
+                    startY: null,
+                }
             })
             console.log(cursorPosition)
           }, [props])
@@ -218,7 +227,6 @@ const Carousel = props => {
                 onTouchMove={(e) => {moveHandle(e)} }
                 onMouseUp={() => {endHandle();} }
                 onMouseOut={() => {endHandle();} }
-                // onMouseOut={() => {setCursorPosition({...cursorPosition, isDown: false})}}
                 onTouchEnd={() => {endHandle();} }
             >
                 {renderImages(props.images)}

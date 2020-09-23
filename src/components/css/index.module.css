@@ -1,3 +1,7 @@
+.disableBodyScroll {
+  overflow: hidden;
+}
+
 .container {
   background: yellow;
   height: 40%;
@@ -43,10 +47,9 @@
 .slide img {
   position: absolute;
   height: 100%;
-}
-
-.slideInView {
-  background-color: red;
+  width: 100%;
+  -o-object-fit: contain;
+     object-fit: contain;
 }
 
 .button_zoom {
