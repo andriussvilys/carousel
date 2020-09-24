@@ -14,10 +14,11 @@ const Carousel = props => {
     const [cursorPosition, setCursorPosition] = React.useState({
           isDown: null,
           startX: null,
+          cursorMove: 0,
           transform: 0,
           prevTransform: props.initialTransform,
           currentSlide: props.index,
-          direction: null,
+        //   direction: null,
           zoom: {...zoomDefault}
         });
 
@@ -34,16 +35,14 @@ const Carousel = props => {
 
     const dots = (imageList) => {
         if(!imageList || imageList.length < 0){return}
-
-        console.log("imagesList")
-        console.log(imageList)
         const dots = imageList.map((image, index) => {
             return <li 
             onClick={() => {
                 slideTo(index)
             }}
             key={`carouselDot-${index}`} 
-            className={`${styles.dot} ${index === cursorPosition.currentSlide ? styles.dot_active : ""}`}></li>
+            className={`${styles.dot} ${index === cursorPosition.currentSlide ? styles.dot_active : ""}`}
+            ></li>
         })
         return <ul className={styles.dotList}>{dots}</ul>
     }
@@ -79,6 +78,7 @@ const Carousel = props => {
                 
             }
             if(cursorPosition.zoom.zoomedIn){
+                console.log("mouse move zoom in")
                 e.preventDefault()
                 if(window.innerWidth < 720){
                     document.querySelector("body").classList.add(styles.disableBodyScroll)
@@ -115,32 +115,58 @@ const Carousel = props => {
                     }
                 })
             }
-            if(!cursorPosition.isDown)return
+            else if(!cursorPosition.isDown){return}
+            console.log("mouse move")
               e.preventDefault();
               var slideContainer = document.querySelector(`.${styles.slideContainer}`);
-              
-              const x = e.touches ? e.touches[0].pageX: e.pageX
-              var walk = 100 * (cursorPosition.startX - x) / slideContainer.clientWidth;
-              var transform = walk + cursorPosition.prevTransform;
+            const container = document.querySelector(`.${styles.container}`)
 
-              var direction = walk > 0 ? 1: -1;
+              
+              const x = e.touches ? e.touches[0].pageX - container.offsetLeft: e.pageX - container.offsetLeft
+              const cursorMove = cursorPosition.startX - x
+              var walk = 100 * (cursorMove) / slideContainer.clientWidth;
+              var transform = walk + cursorPosition.prevTransform;
+            //   var direction = walk > 0 ? 1: -1;
+
               setCursorPosition({
                 ...cursorPosition,
+                cursorMove,
                 transform: transform,
-                direction: direction
+                // direction: direction
               })
           };
 
-          var endHandle = () => {
-              if(cursorPosition.zoom.zoomedIn){ return document.querySelector("body").classList.remove(styles.disableBodyScroll) }
-              if(!cursorPosition.isDown)return
-            document.querySelector(`.${styles.slideContainer}`).classList.add("smoothSlide");
+          var endHandle = (e) => {
+            const container = document.querySelector(`.${styles.slideContainer}`)
+            container.classList.add("smoothSlide");
+            if(cursorPosition.zoom.zoomedIn){ 
+                zoomIn()
+                document.querySelector("body").classList.remove(styles.disableBodyScroll) 
+                return
+            }
+            if(!cursorPosition.isDown){
+                return
+            }
+            if(Math.abs(cursorPosition.cursorMove) < 10){
+                zoomIn()
+                return
+            }
+
+            let direction = null
+            // if(Math.abs(cursorPosition.cursorMove) < 10){   
+            //     const xMiddleGuide = currentSlideRef.current.clientWidth / 2
+            //     direction = cursorPosition.startX > xMiddleGuide ? 1 : -1
+            //     console.log({startX: cursorPosition.startX, xMiddleGuide})
+            // }
+            direction = cursorPosition.cursorMove > 0 ? 1 : -1
+
+            console.log({cursorMove: cursorPosition.cursorMove, direction})
+
             var positionFix = cursorPosition.transform;
-            
             var index = null;
             var slideCount = props.images.length;
-            
             var slideWidth = 100 / slideCount;
+
             if (positionFix > 0) {
               positionFix = 0;
               index = 0;
@@ -150,7 +176,7 @@ const Carousel = props => {
                 index = slideCount - 1;
             } 
             else {
-            index = cursorPosition.currentSlide + cursorPosition.direction;
+            index = cursorPosition.currentSlide + direction;
                 if(index < 0){index = 0}
                 if(index > slideCount - 1){index = slideCount -1 }
                 positionFix = (index) * (100 / slideCount);
@@ -158,6 +184,7 @@ const Carousel = props => {
             setCursorPosition({
             ...cursorPosition,
             isDown: false,
+            cursorMove: 0,
             transform: positionFix,
             prevTransform: positionFix,
             currentSlide: index
@@ -172,24 +199,71 @@ const Carousel = props => {
                 ref={cursorPosition.currentSlide === image.index ? currentSlideRef : null }
                 key={`${image}-${index}`}
                 style={{width: `${100 / props.images.length}%`}}
-                >
+                >                       
                     <img 
-                        className={`
-                        ${cursorPosition.currentSlide === image.index ? styles.slideInView : ""}
-                        `}
-                        ref={cursorPosition.zoom.zoomedIn && cursorPosition.currentSlide === image.index ? zoomRef : null}
+                        ref={cursorPosition.currentSlide === image.index ? zoomRef : null}
+                        // ref={cursorPosition.zoom.zoomedIn && cursorPosition.currentSlide === image.index ? zoomRef : null}
                         style={cursorPosition.zoom.zoomedIn ? 
                             {transform: 
                             `scale(${cursorPosition.zoom.zoomPower}) 
                             translate(${cursorPosition.zoom.x}%, 
                             ${cursorPosition.zoom.y}%)`} 
                             : {}}
+                        // onClick={(e) => {
+                        //     e.stopPropagation()
+                        //     zoomIn()
+                        // }}
                         src={image.src}
                         alt={image.src}
                     />
                 </div>
             )
             })
+        }
+
+        const zoomIn = () => {
+            console.log("ZOOM IN")
+            let zoomedIn = null
+            const countZoom = () => {
+                let zoomPower = cursorPosition.zoom.zoomPower + 1
+                zoomedIn = true
+                if(zoomPower > 3){
+                    zoomPower = 1
+                    zoomedIn = false
+                }
+                return {zoomPower, zoomedIn}
+            }
+            const zoom = countZoom()
+            return setCursorPosition({
+                ...cursorPosition, 
+                isDown: false,
+                zoom: {
+                    ...cursorPosition.zoom,
+                    zoomedIn: zoom.zoomedIn,
+                    zoomPower: zoom.zoomPower,
+                    zoomIndex: cursorPosition.currentSlide,
+                    y: 0,
+                    x: 0
+                }
+            })
+        }
+
+        const zoomOut = () => {
+            if(cursorPosition.zoom.zoomedIn){
+                zoomRef.current.classList.add("smoothSlide")
+                setTimeout(() => {
+                    zoomRef.current.classList.remove("smoothSlide")
+                }, 100);
+                setCursorPosition({
+                    ...cursorPosition,
+                    zoom: {...zoomDefault}
+                    // zoom: {
+                    //     ...cursorPosition.zoom,
+                    //     x: 0,
+                    //     y: 0
+                    // }
+                })
+            }
         }
 
         useEffect(() => {
@@ -216,9 +290,11 @@ const Carousel = props => {
                 onTouchStart={(e) => {startHandle(e)} }
                 onMouseMove={(e) => {moveHandle(e)} }
                 onTouchMove={(e) => {moveHandle(e)} }
-                onMouseUp={() => {endHandle();} }
-                onMouseOut={() => {endHandle();} }
-                onTouchEnd={() => {endHandle();} }
+                onMouseUp={(e) => {endHandle(e);} }
+                onMouseOut={(e) => {endHandle(e); 
+                    zoomOut()
+                } }
+                onTouchEnd={(e) => {endHandle(e);} }
             >
                 {renderImages(props.images)}
             </div>
