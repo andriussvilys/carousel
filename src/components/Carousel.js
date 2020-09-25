@@ -156,9 +156,15 @@ const Carousel = props => {
                 const maxHeight = window.innerHeight
                 const imgToWindowRatio = maxHeight / zoomRef.current.clientHeight
                 const maxZoom = zoomRef.clientHeight
-                const scale = pinchDistance / 100
+                let scale = pinchDistance / 100
+                let zoomStatus = true
+                if(scale <= 1){
+                    scale = 1
+                    zoomStatus = false
+                }
                 setZoom({
                     ...zoom,
+                    zoom: zoomStatus,
                     distance: state.da[0],
                     scale
                 })
