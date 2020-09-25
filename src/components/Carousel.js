@@ -168,7 +168,11 @@ const Carousel = props => {
                     distance: state.da[0],
                     scale
                 })
+            },
+            onPinchEnd: state => {
+                setZoom({...zoomDefault})
             }
+            
 
 
         }
