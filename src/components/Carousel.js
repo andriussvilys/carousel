@@ -49,12 +49,16 @@ const Carousel = props => {
             className={`${styles.slide} ${zoom.zoom ? styles.showOverflow : ""}`}
             // ref={cursorPosition.currentSlide === image.index ? currentSlideRef : null }
             key={`${image}-${index}`}
-            style={{width: `${100 / props.images.length}%`}}
+            // style={{width: `${100 / props.images.length}%`}}
+            style={slidePosition.currentSlide === image.index ? 
+                {width: `${100 / props.images.length}%`, 
+                transform: `scale(${zoom.scale})`} : 
+                {width: `${100 / props.images.length}%`}}
             >                       
                 <img 
                     draggable={false}
-                    // ref={cursorPosition.currentSlide === image.index ? zoomRef : null}
-                    style={{transform: `scale(${zoom.scale})`}}
+                    ref={slidePosition.currentSlide === image.index ? zoomRef : null}
+                    // style={slidePosition.currentSlide === image.index ? {transform: `scale(${zoom.scale})`} : {}}
                         // {transform: 
                         // `scale(${zoom.scale}) 
                         // translate(${zoom.zoom.x}%, 
@@ -165,6 +169,14 @@ const Carousel = props => {
     )
 
     useEffect(() => {
+        if(zoom.zoom){
+            document.querySelector(".App").style.overflow = "hidden"
+        }
+        else{
+            document.querySelector(".App").style.overflow = "unset"
+        }
+      }, [zoom])
+    useEffect(() => {
         slideTo(props.currentSlide)
       }, [props])
 
@@ -221,15 +233,17 @@ const Carousel = props => {
             }}>enlarge</button>
             <div
             style={{
-                position: "absolute",
+                position: "fixed",
                 right: 0,
                 bottom: 0,
-                display: "flex"
+                background: "white",
+                border: "2px solid",
+                padding: "15px"
             }}>
-                <span >distance: {zoom.distance} | </span>
-                <span>origin: {zoom.origin} | </span>
-                <span>scale: {zoom.scale} | </span>
-                <span>zoom: {zoom.zoom ? "true" : "false"} | </span>
+                <p >distance: {zoom.distance}</p>
+                <p>origin: {zoom.origin}</p>
+                <p>scale: {zoom.scale}</p>
+                <p>zoom: {zoom.zoom ? "true" : "false"}</p>
             </div>
             {/* {dots(props.images)} */}
         </div>
