@@ -2,17 +2,20 @@
   overflow: hidden;
 }
 
+.showOverflow {
+  overflow: visible !important;
+}
+
 .container {
   background: yellow;
   height: 40%;
-  width: 80%;
+  width: 100%;
   position: relative;
   overflow: hidden;
   -ms-touch-action: pan-y;
       touch-action: pan-y;
   border: 2px solid;
   margin-top: 200px;
-  margin-left: 50px;
 }
 
 .slideContainer {
