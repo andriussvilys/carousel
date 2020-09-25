@@ -38,6 +38,7 @@
         // width: 100%;
         object-fit: contain;
         cursor: zoom-in;
+        user-select: none;
     }
 }
 .slideInView{
@@ -73,14 +74,4 @@
 }
 .dot_active{
     background: lime;
-}
-
-@keyframes zoomOut{
-    0%{transition: 0.2s all;}
-    100%{transition: 0;}
-}
-
-.zoomOut{
-    animation-name: zoomOut;
-    animation-duration: 0.2s;
 }

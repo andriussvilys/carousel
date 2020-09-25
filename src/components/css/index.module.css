@@ -51,6 +51,10 @@
      object-fit: contain;
   cursor: -webkit-zoom-in;
   cursor: zoom-in;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
 }
 
 .button_zoom {
@@ -94,34 +98,5 @@
 
 .dot_active {
   background: lime;
-}
-
-@-webkit-keyframes zoomOut {
-  0% {
-    -webkit-transition: 0.2s all;
-    transition: 0.2s all;
-  }
-  100% {
-    -webkit-transition: 0;
-    transition: 0;
-  }
-}
-
-@keyframes zoomOut {
-  0% {
-    -webkit-transition: 0.2s all;
-    transition: 0.2s all;
-  }
-  100% {
-    -webkit-transition: 0;
-    transition: 0;
-  }
-}
-
-.zoomOut {
-  -webkit-animation-name: zoomOut;
-          animation-name: zoomOut;
-  -webkit-animation-duration: 0.2s;
-          animation-duration: 0.2s;
 }
 /*# sourceMappingURL=index.module.css.map */

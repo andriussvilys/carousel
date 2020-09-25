@@ -3,7 +3,9 @@ import Carousel from './components/Carousel'
 import './index.css'
 
 const App = props => {
-  let [currentSlide, setCurrentSlide] = React.useState({index: null, initialTransform: null})
+  let [currentSlide, setCurrentSlide] = React.useState({
+    index: 0, 
+    initialTransform: 0})
   var [images, setImages] = React.useState([1, 2, 3, 4, 5])
 
   const families = {

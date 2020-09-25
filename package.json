@@ -2,7 +2,6 @@
   "name": "carousel",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://andriussvilys.github.io/carousel",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
@@ -10,7 +9,8 @@
     "node-sass": "^4.14.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.3"
+    "react-scripts": "3.4.3",
+    "react-use-gesture": "^7.0.16"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -34,8 +34,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "gh-pages": "^3.1.0"
   }
 }
