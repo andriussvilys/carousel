@@ -47,11 +47,11 @@ const Carousel = props => {
         if(!imageList || imageList.length < 0){return}
         const dots = imageList.map((image, index) => {
             return <li 
-            // onClick={() => {
-            //     slideTo(index)
-            // }}
+            onClick={() => {
+                slideTo(index)
+            }}
             key={`carouselDot-${index}`} 
-            // className={`${styles.dot} ${index === cursorPosition.currentSlide ? styles.dot_active : ""}`}
+            className={`${styles.dot} ${index === slidePosition.currentSlide ? styles.dot_active : ""}`}
             ></li>
         })
         return <ul className={styles.dotList}>{dots}</ul>
@@ -72,12 +72,13 @@ const Carousel = props => {
                 <img 
                     draggable={false}
                     // ref={cursorPosition.currentSlide === image.index ? zoomRef : null}
-                    // style={cursorPosition.zoom.zoomedIn ? 
-                    //     {transform: 
-                    //     `scale(${cursorPosition.zoom.zoomPower}) 
-                    //     translate(${cursorPosition.zoom.x}%, 
-                    //     ${cursorPosition.zoom.y}%)`} 
-                    //     : {}}
+                    style={{transform: `scale(${zoom.scale})`}}
+                        // {transform: 
+                        // `scale(${zoom.scale}) 
+                        // translate(${zoom.zoom.x}%, 
+                        // ${zoom.zoom.y}%)
+                        // `} 
+                        // : {}}
                     src={image.src}
                     alt={image.src}
                 />
@@ -93,11 +94,14 @@ const Carousel = props => {
         currentTransform: props.initialTransform
     })
     const [zoom, setZoom] = React.useState({
-        scale: 0,
-        distance: 0
+        zoom: false,
+        scale: 1,
+        distance: 0,
+        origin: 0
     })
 
     const dragEndHandler = (x) => {
+        if(zoom.zoom){return}
         const direction = x < 0 ? 1 : -1
 
         var positionFix = slidePosition.currentTransform;
@@ -134,7 +138,8 @@ const Carousel = props => {
             onDragEnd: (state) => dragEndHandler(state.movement[0]),
             // onDrag: ({movement: [mx, my]}) => {
             onDrag: (state) => {
-                console.log(state)
+                if(zoom.zoom){return}
+                // console.log(state)
                 // state.event.stopPropagation()
                   const containerWidth = containerRef.current.clientWidth;
                   const slideCount = props.images.length
@@ -148,11 +153,21 @@ const Carousel = props => {
                     currentTransform: transform,
                     })
             },
-            onPinch: state => {
-                // console.log(state.da[0])
+            onPinchStart: state => {
                 setZoom({
                     ...zoom,
-                    distance: state.da[0]
+                    zoom: true
+                })
+            },
+            onPinch: state => {
+                // console.log(state.da[0])
+                const pinchDistance = state.da[0]
+                const containerHeight = containerRef.current.clientHeight;
+                const scale = 1 + (pinchDistance * 100 / containerHeight)
+                setZoom({
+                    ...zoom,
+                    distance: state.da[0],
+                    scale
                 })
             }
 
@@ -211,12 +226,18 @@ const Carousel = props => {
                 //     }
                 // })
             }}>enlarge</button>
-            <span style={{
+            <div
+            style={{
                 position: "absolute",
                 right: 0,
-                bottom: 0
-            }}>{zoom.distance}</span>
-            {dots(props.images)}
+                bottom: 0,
+                display: "flex"
+            }}>
+                <span >distance: {zoom.distance} | </span>
+                <span>origin: {zoom.origin} | </span>
+                <span>scale: {zoom.scale} | </span>
+            </div>
+            {/* {dots(props.images)} */}
         </div>
     )
 }
