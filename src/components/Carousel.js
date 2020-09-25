@@ -149,7 +149,11 @@ const Carousel = props => {
                     })
             },
             onPinch: state => {
-                console.log(state.da[0])
+                // console.log(state.da[0])
+                setZoom({
+                    ...zoom,
+                    distance: state.da[0]
+                })
             }
 
 
