@@ -250,7 +250,7 @@ const Carousel = props => {
             },
             onPinch: state => {
                 // console.log(state.da[0])
-                zoomPanHandler(state)
+                // zoomPanHandler(state)
                 const pinchDistance = state.da[0]
                 const containerHeight = containerRef.current.clientHeight;
                 const maxHeight = window.innerHeight
