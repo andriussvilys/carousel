@@ -172,7 +172,9 @@ const Carousel = props => {
             smooth: true
         })
     }
-    const calcZoomPan = (state) => {
+    const calcZoomPan = (cursorX, cursorY) => {
+
+        console.log({cursorX, cursorY})
         const container = containerRef.current
         const slideContainer = slideContainerRef.current
         const zoomedImage = zoomRef.current
@@ -184,19 +186,18 @@ const Carousel = props => {
         const visibleSectionY = imgToSlideHeightRatio / zoom.scale
         const marginY = ((100 - visibleSectionY) / 2) + 10
         const middleGuideY = slideContainer.clientHeight / 2
-        // let y = state.event.touches ? state.event.touches[0].clientY - offset.y : state.event.clientY - offset.y;
-        let y = state.xy[1] - offset.y
+        let y = cursorY - offset.y
         let moveY = y - middleGuideY
         let panY = (moveY * marginY / middleGuideY)
 
-        let cursorPositionX = (state.xy[0] - offset.x)
-
+        let cursorPositionX = cursorX - offset.x
         const panX = ((50 / (container.clientWidth / 2)) * cursorPositionX) - 50
 
         return {x: panX, y: panY}
     }
     const zoomPanHandler = (state) => {
-        const {x, y} = calcZoomPan(state)
+        console.log({x: state.xy[0], y: state.xy[1]})
+        const {x, y} = calcZoomPan(state.xy[0], state.xy[1])
         setZoom({
             ...zoom,
             smooth: null,
@@ -205,12 +206,12 @@ const Carousel = props => {
             }
         })
     }
-    const zoomHandler = (state) => {
-        if(!zoom.zoom || zoom.pinch){
-            return
-        }
-        zoomPanHandler(state)
-    }
+    // const zoomHandler = (state) => {
+    //     if(!zoom.zoom || zoom.pinch){
+    //         return
+    //     }
+    //     zoomPanHandler(state)
+    // }
 
 
 
@@ -244,17 +245,13 @@ const Carousel = props => {
                 console.log("PINCH")
                 console.log(state.origin)
                 const pinchDistance = state.da[0]
-                const containerHeight = containerRef.current.clientHeight;
-                const maxHeight = window.innerHeight
-                const imgToWindowRatio = maxHeight / zoomRef.current.clientHeight
-                const maxZoom = zoomRef.clientHeight
                 let scale = pinchDistance / 100
                 let zoomStatus = true
                 if(scale <= 1){
                     scale = 1
                     zoomStatus = false
                 }
-                const {panX, panY} = calcZoomPan(state)
+                const {panX, panY} = calcZoomPan(state.origin[0], state.origin[1])
                 setZoom({
                     ...zoom,
                     zoom: zoomStatus,
@@ -286,20 +283,21 @@ const Carousel = props => {
                 moveEndHandler(state)
             },
             onMove: state => {
-                zoomHandler(state)
+                if(!zoom.zoom || zoom.pinch)return
+                zoomPanHandler(state)
             },
-            onMoveEnd: state => {
-                setZoom({
-                    ...zoom,
-                    smooth: true,
-                    zoom: false,
-                    scale: 1,
-                    position: {
-                        x: 0,
-                        y: 0
-                    }
-                })
-            }
+            // onMoveEnd: state => {
+            //     setZoom({
+            //         ...zoom,
+            //         smooth: true,
+            //         zoom: false,
+            //         scale: 1,
+            //         position: {
+            //             x: 0,
+            //             y: 0
+            //         }
+            //     })
+            // }
         },
         {...genericOptions},
     )
