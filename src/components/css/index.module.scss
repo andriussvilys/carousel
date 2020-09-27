@@ -11,7 +11,8 @@
     background: yellow;
     height: 40%;
     width: 100%;
-    // width: 80%;
+    // width: 60%;
+    // margin-left: 100px;
     position: relative;
     overflow: hidden;
     touch-action: pan-y;
@@ -41,6 +42,7 @@
     align-items: center;
     overflow: hidden;
     background-color: white;
+    will-change: transform;
     // cursor: ew-resize;
     img{
         position: absolute;
@@ -52,7 +54,30 @@
         user-select: none;
         background-color: white;
         border: 1px solid;
+        will-change: transform;
     }
+    img:after{
+        content: "";
+        height: 1px;
+        width: 1px;
+        background: red;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+    }
+}
+.slide:after{
+    content: "";
+    height: 100%;
+    width: 2px;
+    background: red;
+    position: absolute;
+    top: 0%;
+    left: calc(50% - 1px);
+}
+.imgContainer{
+    width: 100%;
+    display: block;
 }
 .slideInView{
     // background-color: red;
