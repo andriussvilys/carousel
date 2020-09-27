@@ -91,7 +91,10 @@ const Carousel = props => {
         smooth: true,
         scale: 1,
         distance: 0,
-        origin: 0,
+        origin: {
+            x: 0,
+            y: 0
+        },
         position: {
             x: 0,
             y: 0
@@ -251,6 +254,8 @@ const Carousel = props => {
             onPinch: state => {
                 // console.log(state.da[0])
                 // zoomPanHandler(state)
+                console.log("PINCH")
+                console.log(state.origin)
                 const pinchDistance = state.da[0]
                 const containerHeight = containerRef.current.clientHeight;
                 const maxHeight = window.innerHeight
@@ -268,10 +273,14 @@ const Carousel = props => {
                     pinch: true,
                     distance: state.da[0],
                     scale,
-                    position: {
-                        x: state.xy[0],
-                        y: state.xy[1]
+                    origin: {
+                        x: state.origin[0],
+                        y: state.origin[1]
                     }
+                    // position: {
+                    //     x: state.xy[0],
+                    //     y: state.xy[1]
+                    // }
                 })
             },
             onPinchEnd: state => {
@@ -390,8 +399,9 @@ const Carousel = props => {
                 <p >distance: {zoom.distance}</p>
                 <p>scale: {zoom.scale}</p>
                 <p>zoom: {zoom.zoom ? "true" : "false"}</p>
-                <p>postion: </p>
-                <p>x: {zoom.position.x} | y: {zoom.position.y}</p>
+                <p>origin: </p>
+                <p>x: {zoom.origin.x} | y: {zoom.origin.y}</p>
+                {/* <p>x: {zoom.position.x} | y: {zoom.position.y}</p> */}
             </div>
             {dots(props.images)}
         </div>
