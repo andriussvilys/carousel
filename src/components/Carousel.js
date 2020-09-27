@@ -230,6 +230,7 @@ const Carousel = props => {
                 moveStartHandeler()
             },
             onDrag: (state) => {
+                if(state.event.touches && state.event.touches.length > 1){return}
                 moveHandler(state, {moveSpeed: 2, direction: 1})
             },
             onDragEnd: (state) => moveEndHandler(state),
@@ -251,7 +252,8 @@ const Carousel = props => {
                     scale = 1
                     zoomStatus = false
                 }
-                const {panX, panY} = calcZoomPan(state.origin[0], state.origin[1])
+                const {x, y} = calcZoomPan(state.origin[0], state.origin[1])
+                // const {x, y} = calcZoomPan(state.xy[0], state.xy[1])
                 setZoom({
                     ...zoom,
                     zoom: zoomStatus,
@@ -259,12 +261,10 @@ const Carousel = props => {
                     distance: state.da[0],
                     scale,
                     origin: {
-                        x: panX,
-                        y: panY
+                        x, y
                     },
                     position: {
-                        x: panX,
-                        y: panY
+                        x, y
                     }
                 })
             },
