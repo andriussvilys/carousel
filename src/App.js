@@ -70,8 +70,8 @@ const App = props => {
                           onClick={() => {
                             setImages(families[family]);
                             setCurrentSlide({index: image.index, initialTransform: (100 / array.length * image.index)});
-                            var slideContainer = document.getElementById("slideContainer");
-                            slideContainer.classList.add("smoothSlide");
+                            // var slideContainer = document.getElementById("slideContainer");
+                            // slideContainer.classList.add("smoothSlide");
                           }}
                       />
                     </div>

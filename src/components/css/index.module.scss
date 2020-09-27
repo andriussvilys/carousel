@@ -4,6 +4,9 @@
 .showOverflow{
     overflow: visible !important;
 }
+.smoothSlide {
+	transition: transform .2s;
+}
 .container{
     background: yellow;
     height: 40%;
@@ -26,6 +29,9 @@
     display: flex;
     touch-action: pan-y;
     background-color: white;
+    will-change: transform;
+    overflow: hidden;
+    z-index: 999;
 }
 .slide{
     border: 1px solid blue;
@@ -38,11 +44,13 @@
     img{
         position: absolute;
         height: 100%;
+        max-width: 100%;
         // width: 100%;
         object-fit: contain;
         cursor: zoom-in;
         user-select: none;
         background-color: white;
+        border: 1px solid;
     }
 }
 .slideInView{

@@ -12,10 +12,6 @@ html {
 	padding: 0;
 }
 
-.smoothSlide {
-	transition: transform .2s;
-}
-
 .fams {
 	padding: 20px;
 	height: 60%;
