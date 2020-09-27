@@ -9,13 +9,18 @@ const Carousel = props => {
 
     const slideTo = (index) => {
         const newTransfrom = -((100 / props.images.length) * index)
-        setZoom({...zoomDefault})
-        setSlidePosition({
-            ...slidePosition,
-            currentSlide: index,
-            currentTransform: newTransfrom,
-            prevTransform: newTransfrom,
-        })
+        let delay = zoom.zoom ? 400 : 0
+        if(zoom.zoom){
+            setZoom({...zoomDefault})
+        }
+        setTimeout(() => {            
+            setSlidePosition({
+                ...slidePosition,
+                currentSlide: index,
+                currentTransform: newTransfrom,
+                prevTransform: newTransfrom,
+            })
+        }, delay);
     }
 
     const dots = (imageList) => {
@@ -76,7 +81,7 @@ const Carousel = props => {
     const zoomDefault =  {
         pinch: null,
         zoom: null,
-        smooth: null,
+        smooth: true,
         scale: 1,
         distance: 0,
         origin: 0,
