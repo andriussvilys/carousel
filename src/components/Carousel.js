@@ -42,11 +42,11 @@ const Carousel = props => {
         return (
             <div
             className={`${styles.slide} ${zoom.pinch ? styles.showOverflow : ""} ${zoom.smooth ? styles.smoothSlide : ""}`}
-            // ref={cursorPosition.currentSlide === image.index ? currentSlideRef : null }
+            // ref={cursorPosition.currentSlide === index ? currentSlideRef : null }
             key={`${image}-${index}`}
             // style={{width: `${100 / props.images.length}%`}}
             style={{width: `${100 / props.images.length}%`}}
-            // style={slidePosition.currentSlide === image.index ? 
+            // style={slidePosition.currentSlide === index ? 
             //     {width: `${100 / props.images.length}%`, 
             //     transform: `scale(${zoom.scale})`} : 
             //     {width: `${100 / props.images.length}%`}}
@@ -54,8 +54,20 @@ const Carousel = props => {
                 {/* <div className={styles.imgContainer}> */}
                     <img 
                         // draggable={false}
-                        style={slidePosition.currentSlide === image.index ? 
+                        style={slidePosition.currentSlide === index ? 
                             {transform: `scale(${zoom.scale}) translate(${zoom.position.x}%, ${zoom.position.y}%)`} : {}}
+                        // onClick={() => {
+                        //     let newScale = zoom.scale + 1
+                        //     let newZoom = true
+                        //     newScale = newScale > 3 ? 1 : newScale
+                        //     newZoom = newScale === 1 ? false : true
+                        //     setZoom({
+                        //         ...zoom,
+                        //         zoom: newZoom,
+                        //         scale: newScale,
+                        //         smooth: true
+                        //     })
+                        // }}
                         // style={zoom.zoom ? 
                         //     {transform: 
                         //     `translate(${zoom.position.x}%, 
@@ -66,8 +78,8 @@ const Carousel = props => {
                         //     `translate(${zoom.position.x}%, 
                         //     ${zoom.position.y}%)`} 
                         //     : {}}
-                        className={`${zoom.smooth ? styles.smoothSlide : ""}`}
-                        ref={slidePosition.currentSlide === image.index ? zoomRef : null}
+                        className={`${zoom.smooth && slidePosition.currentSlide === index ? styles.smoothSlide : ""}`}
+                        ref={slidePosition.currentSlide === index ? zoomRef : null}
                         src={image.src}
                         alt={image.src}
                     />
@@ -160,61 +172,36 @@ const Carousel = props => {
             smooth: true
         })
     }
-    const zoomPanHandler = (state) => {
-        // console.log(state.event.type)
+    const calcZoomPan = (state) => {
         const container = containerRef.current
         const slideContainer = slideContainerRef.current
         const zoomedImage = zoomRef.current
-        const slideCount = props.images.length
-        // const containerRect = container.getBoundingClientRect()
-        // const containerOffset = {
-        //     x: containerRect.x,
-        //     y: containerRect.y
-        // }
-        // const transform = {
-        //     x: state.xy[0] - containerOffset.x,
-        //     y: state.xy[1] - containerOffset.y
-        // }
 
         const offset = {y: container.getBoundingClientRect().y, x: container.getBoundingClientRect().x, top: container.getBoundingClientRect().top}
 
         const imgToSlideHeightRatio = zoomedImage.clientHeight * 100 / slideContainer.clientHeight
-        const imgToSlideWidthRatio = zoomedImage.clientWidth * 100 / (slideContainer.clientWidth / slideCount)
         
         const visibleSectionY = imgToSlideHeightRatio / zoom.scale
         const marginY = ((100 - visibleSectionY) / 2) + 10
         const middleGuideY = slideContainer.clientHeight / 2
-        let y = state.event.touches ? state.event.touches[0].clientY - offset.y : state.event.clientY - offset.y;
+        // let y = state.event.touches ? state.event.touches[0].clientY - offset.y : state.event.clientY - offset.y;
+        let y = state.xy[1] - offset.y
         let moveY = y - middleGuideY
         let panY = (moveY * marginY / middleGuideY)
-        // let panY = (moveY * marginY / middleGuideY).toFixed(2)
 
-        // console.log({panY, y, middleGuideY, offsetY: offset.y, offsetTop: offset.top})
-
-        const visibleSectionX = imgToSlideWidthRatio / zoom.scale
-        // const marginX = ((100 - visibleSectionX) / 2) + 10
-        // const middleGuideX = (slideContainer.clientWidth / slideCount) / 2
-        // let x = state.event.touches ? state.event.touches[0].clientX - offset.x : state.event.clientX - offset.x
-        // let moveX = state.xy[0] - middleGuideX
-        // let panX = (moveX * marginX / middleGuideX)
-
-
-        const startX = (container.clientWidth / 2)
         let cursorPositionX = (state.xy[0] - offset.x)
-        // const transformX = (cursorPositionX - startX) * 100 / zoomedImage.clientWidth / zoom.scale
-        // let panX = transformX
 
         const panX = ((50 / (container.clientWidth / 2)) * cursorPositionX) - 50
-        console.log({panX, cursorPositionX})
-        // console.log({startX, transformX, cursorPositionX, imgWidth: zoomedImage.clientWidth, visible: visibleSectionX})
-        console.log(state)
+
+        return {x: panX, y: panY}
+    }
+    const zoomPanHandler = (state) => {
+        const {x, y} = calcZoomPan(state)
         setZoom({
             ...zoom,
             smooth: null,
             position: {
-                // y: 0,
-                x: panX,
-                y: panY
+                x, y
             }
         })
     }
@@ -267,6 +254,7 @@ const Carousel = props => {
                     scale = 1
                     zoomStatus = false
                 }
+                const {panX, panY} = calcZoomPan(state)
                 setZoom({
                     ...zoom,
                     zoom: zoomStatus,
@@ -274,13 +262,13 @@ const Carousel = props => {
                     distance: state.da[0],
                     scale,
                     origin: {
-                        x: state.origin[0],
-                        y: state.origin[1]
+                        x: panX,
+                        y: panY
+                    },
+                    position: {
+                        x: panX,
+                        y: panY
                     }
-                    // position: {
-                    //     x: state.xy[0],
-                    //     y: state.xy[1]
-                    // }
                 })
             },
             onPinchEnd: state => {
@@ -300,15 +288,18 @@ const Carousel = props => {
             onMove: state => {
                 zoomHandler(state)
             },
-            // onMoveEnd: state => {
-            //     setZoom({
-            //         ...zoom,
-            //         position: {
-            //             x: 0,
-            //             y: 0
-            //         }
-            //     })
-            // }
+            onMoveEnd: state => {
+                setZoom({
+                    ...zoom,
+                    smooth: true,
+                    zoom: false,
+                    scale: 1,
+                    position: {
+                        x: 0,
+                        y: 0
+                    }
+                })
+            }
         },
         {...genericOptions},
     )
@@ -364,28 +355,6 @@ const Carousel = props => {
                     scale: newScale,
                     smooth: true
                 })
-                // let zoomedIn = null
-                // const countZoom = () => {
-                //     let zoomPower = cursorPosition.zoom.zoomPower + 1
-                //     zoomedIn = true
-                //     if(zoomPower > 3){
-                //         zoomPower = 1
-                //         zoomedIn = false
-                //     }
-                //     return {zoomPower, zoomedIn}
-                // }
-                // const zoom = countZoom()
-                // setCursorPosition({
-                //     ...cursorPosition, 
-                //     zoom: {
-                //         ...cursorPosition.zoom,
-                //         zoomedIn: zoom.zoomedIn,
-                //         zoomPower: zoom.zoomPower,
-                //         zoomIndex: cursorPosition.currentSlide,
-                //         y: 0,
-                //         x: 0
-                //     }
-                // })
             }}>enlarge</button>
             <div
             style={{
