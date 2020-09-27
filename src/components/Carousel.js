@@ -4,24 +4,17 @@ import { useDrag, useMove, useGesture } from 'react-use-gesture'
 import styles from './css/index.module.scss'
 
 const Carousel = props => {
-    const zoomDefault =  {
-        zoom: false,
-        scale: 1,
-        distance: 0,
-        origin: 0
-    }
-
     const zoomRef = React.useRef(null)
     const currentSlideRef = React.useRef(null)
 
     const slideTo = (index) => {
         const newTransfrom = -((100 / props.images.length) * index)
+        setZoom({...zoomDefault})
         setSlidePosition({
             ...slidePosition,
             currentSlide: index,
             currentTransform: newTransfrom,
             prevTransform: newTransfrom,
-            zoom: {...zoomDefault}
         })
     }
 
@@ -46,7 +39,7 @@ const Carousel = props => {
         return data.map((image, index) => {
         return (
             <div
-            className={`${styles.slide} ${zoom.zoom ? styles.showOverflow : ""}`}
+            className={`${styles.slide} ${zoom.pinch ? styles.showOverflow : ""} ${zoom.smooth ? styles.smoothSlide : ""}`}
             // ref={cursorPosition.currentSlide === image.index ? currentSlideRef : null }
             key={`${image}-${index}`}
             // style={{width: `${100 / props.images.length}%`}}
@@ -57,14 +50,13 @@ const Carousel = props => {
             >                       
                 <img 
                     draggable={false}
+                    style={zoom.zoom ? 
+                        {transform: 
+                        `translate(${zoom.position.x}%, 
+                        ${zoom.position.y}%)`} 
+                        : {}}
+                    className={`${zoom.smooth ? styles.smoothSlide : ""}`}
                     ref={slidePosition.currentSlide === image.index ? zoomRef : null}
-                    // style={slidePosition.currentSlide === image.index ? {transform: `scale(${zoom.scale})`} : {}}
-                        // {transform: 
-                        // `scale(${zoom.scale}) 
-                        // translate(${zoom.zoom.x}%, 
-                        // ${zoom.zoom.y}%)
-                        // `} 
-                        // : {}}
                     src={image.src}
                     alt={image.src}
                 />
@@ -74,75 +66,161 @@ const Carousel = props => {
     }
           
     const containerRef = React.useRef()
+    const slideContainerRef = React.useRef()
     const [slidePosition, setSlidePosition] = React.useState({
+        smooth: true,
         currentSlide: props.currentSlide,
         prevTransform: props.initialTransform,
         currentTransform: props.initialTransform
     })
-    const [zoom, setZoom] = React.useState({
-        zoom: false,
+    const zoomDefault =  {
+        pinch: null,
+        zoom: null,
+        smooth: null,
         scale: 1,
         distance: 0,
-        origin: 0
-    })
+        origin: 0,
+        position: {
+            x: 0,
+            y: 0
+        }
+    }
+    const [zoom, setZoom] = React.useState({...zoomDefault})
 
-    const dragEndHandler = (x) => {
+    const moveStartHandeler = (state) => {
+        console.log("START MOVE")
+        // setSlidePosition({
+        //     ...slidePosition,
+        //     smooth: false
+        // })
+    }
+    const moveHandler = (state, options) => {
+        console.log("MOVE")
         if(zoom.zoom){
             console.log("zoom")
-            return}
-        const direction = x < 0 ? 1 : -1
+        return}
+          const containerWidth = containerRef.current.clientWidth;
+          const slideCount = props.images.length
+          const slideWidth = 100 / slideCount
+          let  transform = slidePosition.prevTransform + ((state.movement[0] * options.direction * options.moveSpeed * 100 / containerWidth) / slideCount)
+
+        // if(transform > 0){
+        //     transform = -100 + slideWidth
+        // }
+        // if(transform < -100 + slideWidth){
+        //     transform = 0
+        // }
+        if(transform > 0){
+            transform = 0
+        }
+        if(transform < -100 + slideWidth){
+            transform = -100 + slideWidth
+        }
+        var index = Math.abs(Math.round(transform/slideWidth))
+        index = index > slideCount - 1 ? slideCount - 1 : index
+
+          return setSlidePosition({ 
+            ...slidePosition,  
+            currentSlide: index,
+            currentTransform: transform,
+            smooth: false
+            })
+    }
+    const moveEndHandler = (state) => {
+        if(zoom.zoom){
+            console.log("zoom")
+        return}
 
         var positionFix = slidePosition.currentTransform;
         var slideCount = props.images.length;
         var slideWidth = 100 / slideCount;
-        var index = null
+        positionFix = positionFix > 0 ? 0 : positionFix
+        // var index = Math.abs(Math.round(positionFix/slideWidth))
+        // index = index > props.images.length - 1 ? props.images.length - 1 : index
+        const index = slidePosition.currentSlide
 
-        if (positionFix > 0) {
-          positionFix = 0;
-          index = 0;
-        } 
-        if (positionFix < slideWidth - 100) {
-            positionFix = (slideWidth - 100);
-            index = slideCount - 1;
-        } 
-        else {
-        index = slidePosition.currentSlide + direction;
-        // console.log({currentSlide: slidePosition.currentSlide, next: index, direction, x})
-            if(index < 0){index = 0}
-            if(index > slideCount - 1){index = slideCount -1 }
-            positionFix = -((index) * (100 / slideCount));
-        }
+        positionFix = (0 - (slideWidth * index))
+
         return setSlidePosition({
             ...slidePosition, 
-            currentSlide: index,
+            // currentSlide: index,
             // prevTransform: slidePosition.currentTransform,
             prevTransform: positionFix,
             currentTransform: positionFix,
+            distance: null,
+            smooth: true
         })
     }
+    const zoomHandler = (state) => {
+        if(!zoom.zoom || zoom.pinch){
+            return
+        }
+        const container = containerRef.current
+        const slideContainer = slideContainerRef.current
+        const zoomedImage = zoomRef.current
+        const slideCount = props.images.length
+        const containerRect = container.getBoundingClientRect()
+        const containerOffset = {
+            x: containerRect.x,
+            y: containerRect.y
+        }
+        const transform = {
+            x: state.xy[0] - containerOffset.x,
+            y: state.xy[1] - containerOffset.y
+        }
 
+        const offset = {y: container.getBoundingClientRect().y, x: container.getBoundingClientRect().x, top: container.getBoundingClientRect().top}
+
+        const imgToSlideHeightRatio = zoomedImage.clientHeight * 100 / slideContainer.clientHeight
+        const imgToSlideWidthRatio = zoomedImage.clientWidth * 100 / (slideContainer.clientWidth / slideCount)
+        
+        const visibleSectionY = imgToSlideHeightRatio / zoom.scale
+        const marginY = ((100 - visibleSectionY) / 2) + 10
+        const middleGuideY = slideContainer.clientHeight / 2
+        let y = state.event.touches ? state.event.touches[0].clientY - offset.y : state.event.clientY - offset.y;
+        let moveY = y - middleGuideY
+        let panY = (moveY * marginY / middleGuideY).toFixed(2)
+
+        // console.log({panY, y, middleGuideY, offsetY: offset.y, offsetTop: offset.top})
+
+        const visibleSectionX = imgToSlideWidthRatio / zoom.scale
+        const marginX = ((100 - visibleSectionX) / 2) + 10
+        const middleGuideX = (slideContainer.clientWidth / slideCount) / 2
+        let x = state.event.touches ? state.event.touches[0].clientX - offset.x : state.event.clientX - offset.x
+        let moveX = state.xy[0] - middleGuideX
+        let panX = (moveX * marginX / middleGuideX).toFixed(2)
+
+        console.log({panX, panY, X: state.xy[0]})
+        setZoom({
+            ...zoom,
+            smooth: null,
+            position: {
+                x: panX,
+                y: panY
+            }
+        })
+        // console.log(state)
+    }
+
+
+
+    const genericOptions = {
+        filterTaps: true,
+        domTarget: slideContainerRef,
+        eventOptions: {
+            passive: false
+        }
+        // threshold: 10
+    }
     const bind = useGesture(
         {
-            onDragEnd: (state) => dragEndHandler(state.movement[0]),
-            // onDrag: ({movement: [mx, my]}) => {
-            onDrag: (state) => {
-                if(zoom.zoom){
-                    console.log("zoom")
-                    return}
-                // console.log(state)
-                // state.event.stopPropagation()
-                  const containerWidth = containerRef.current.clientWidth;
-                  const slideCount = props.images.length
-                  let  transform = slidePosition.prevTransform + ((state.movement[0] * 100 / containerWidth) / slideCount)
-
-                //   transform = transform.toFixed(2)
-                //   console.log({transform})
-                //   console.log({...slidePosition})
-                  return setSlidePosition({ 
-                    ...slidePosition,  
-                    currentTransform: transform,
-                    })
+            onDragStart: () => {
+                moveStartHandeler()
             },
+            onDrag: (state) => {
+                moveHandler(state, {moveSpeed: 2, direction: 1})
+            },
+            onDragEnd: (state) => moveEndHandler(state),
             onPinchStart: state => {
                 setZoom({
                     ...zoom,
@@ -165,40 +243,68 @@ const Carousel = props => {
                 setZoom({
                     ...zoom,
                     zoom: zoomStatus,
+                    pinch: true,
                     distance: state.da[0],
                     scale
                 })
             },
             onPinchEnd: state => {
                 setZoom({...zoomDefault})
-            }
-            
-
-
-        }
+            },
+            onWheelStart: () => {
+                moveStartHandeler()
+            },
+            onWheel: (state) => {
+                moveHandler(state, {moveSpeed: 1.5, direction: -1})
+            },
+            onWheelEnd: state => {
+                moveEndHandler(state)
+            },
+            onMove: state => {
+                zoomHandler(state)
+            },
+            // onMoveEnd: state => {
+            //     setZoom({
+            //         ...zoom,
+            //         position: {
+            //             x: 0,
+            //             y: 0
+            //         }
+            //     })
+            // }
+        },
+        {...genericOptions},
     )
 
     useEffect(() => {
-        if(zoom.zoom){
+        if(zoom.pinch){
             document.querySelector(".App").style.overflow = "hidden"
         }
         else{
             document.querySelector(".App").style.overflow = "unset"
         }
       }, [zoom])
+
     useEffect(() => {
+        console.log("props change")
         slideTo(props.currentSlide)
       }, [props])
+
+      useEffect(bind, [bind])
+    // useEffect(() => {
+    //     slideTo(props.currentSlide)
+    //   }, [props])
 
     return(
             <div 
                 ref={containerRef}
-                className={`${styles.container} ${zoom.zoom ? styles.showOverflow : ""}`}
+                className={`${styles.container} ${zoom.pinch ? styles.showOverflow : ""}`}
             >
             <div 
-                {...bind()}
-                id="slideContainer"
-                className={styles.slideContainer}
+                // {...bind()}
+                id={"slideContainer"}
+                className={`${styles.slideContainer} ${slidePosition.smooth ? styles.smoothSlide : ""} ${zoom.pinch ? styles.showOverflow : ""}`}
+                ref={slideContainerRef}
                 style={{
                     width: `${100 * props.images.length}%`,
                     // transform: `translateX(${-cursorPosition.transform}%)`
@@ -215,8 +321,10 @@ const Carousel = props => {
                 newScale = newScale > 3 ? 1 : newScale
                 newZoom = newScale === 1 ? false : true
                 setZoom({
+                    ...zoom,
                     zoom: newZoom,
-                    scale: newScale
+                    scale: newScale,
+                    smooth: true
                 })
                 // let zoomedIn = null
                 // const countZoom = () => {
@@ -251,11 +359,12 @@ const Carousel = props => {
                 padding: "15px"
             }}>
                 <p >distance: {zoom.distance}</p>
-                <p>origin: {zoom.origin}</p>
                 <p>scale: {zoom.scale}</p>
                 <p>zoom: {zoom.zoom ? "true" : "false"}</p>
+                <p>postion: </p>
+                <p>x: {zoom.position.x} | y: {zoom.position.y}</p>
             </div>
-            {/* {dots(props.images)} */}
+            {dots(props.images)}
         </div>
     )
 }

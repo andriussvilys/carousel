@@ -6,6 +6,13 @@
   overflow: visible !important;
 }
 
+.smoothSlide {
+  -webkit-transition: -webkit-transform .2s;
+  transition: -webkit-transform .2s;
+  transition: transform .2s;
+  transition: transform .2s, -webkit-transform .2s;
+}
+
 .container {
   background: yellow;
   height: 40%;
@@ -30,6 +37,9 @@
   -ms-touch-action: pan-y;
       touch-action: pan-y;
   background-color: white;
+  will-change: transform;
+  overflow: hidden;
+  z-index: 999;
 }
 
 .slide {
@@ -50,6 +60,7 @@
 .slide img {
   position: absolute;
   height: 100%;
+  max-width: 100%;
   -o-object-fit: contain;
      object-fit: contain;
   cursor: -webkit-zoom-in;
@@ -59,6 +70,7 @@
       -ms-user-select: none;
           user-select: none;
   background-color: white;
+  border: 1px solid;
 }
 
 .button_zoom {
