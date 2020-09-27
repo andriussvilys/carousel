@@ -347,11 +347,13 @@ const Carousel = props => {
                 let newZoom = true
                 newScale = newScale > 3 ? 1 : newScale
                 newZoom = newScale === 1 ? false : true
+                const position = newScale === 1 ? {x: 0, y: 0} : zoom.position
                 setZoom({
                     ...zoom,
                     zoom: newZoom,
                     scale: newScale,
-                    smooth: true
+                    smooth: true,
+                    position
                 })
             }}>enlarge</button>
             <div
