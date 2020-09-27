@@ -55,6 +55,7 @@
       -ms-flex-align: center;
           align-items: center;
   overflow: hidden;
+  background-color: white;
 }
 
 .slide img {
