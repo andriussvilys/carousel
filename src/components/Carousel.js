@@ -266,7 +266,7 @@ const Carousel = props => {
                 })
             },
             onPinchEnd: state => {
-                setZoom({...zoomDefault})
+                setZoom({...zoomDefault, smooth: true})
             },
             onWheelStart: () => {
                 moveStartHandeler()
