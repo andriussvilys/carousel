@@ -77,15 +77,16 @@ const Carousel = props => {
                     ref={slidePosition.currentSlide === index ? zoomRef : null}
                     src={image.src}
                     alt={image.src}
-                    onClick={(e) => {
-                        console.log(e)
-                        console.log(e.touches)
-                        console.log(e.target)
-                        if(e.touches && e.touches.length > 0){
-                            console.log(e.touches)
-                            alert("touches")
-                            return
-                        }
+                    onMouseDown={(e) => {
+                        // console.log(e)
+                        // console.log(e.touches)
+                        // console.log(e.target)
+                        // if(e.touches && e.touches.length > 0){
+                        //     console.log(e.touches)
+                        //     alert("touches")
+                        //     return
+                        // }
+                        // alert(e.type)
                         let newScale = zoom.scale + 1
                         let newZoom = true
                         newScale = newScale > 3 ? 1 : newScale
