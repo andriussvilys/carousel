@@ -40,7 +40,9 @@ const Carousel = props => {
         return data.map((image, index) => {
         return (
             <div
-            className={`${styles.slide} ${zoom.pinch ? styles.showOverflow : ""} ${zoom.smooth ? styles.smoothSlide : ""}`}
+            className={`${styles.slide} ${zoom.pinch ? styles.showOverflow : ""}`}
+            // className={`${styles.slide} ${zoom.pinch ? styles.showOverflow : ""} 
+            // ${zoom.smooth ? styles.smoothSlide : ""}`}
             key={`${image}-${index}`}
             style={{width: `${100 / props.images.length}%`}}
             >                    
@@ -51,7 +53,10 @@ const Carousel = props => {
                     ref={slidePosition.currentSlide === index ? zoomRef : null}
                     src={image.src}
                     alt={image.src}
-                    onClick={() => {
+                    onClick={(e) => {
+                        if(e.touches && e.touches.length > 1){
+                            return
+                        }
                         let newScale = zoom.scale + 1
                         let newZoom = true
                         newScale = newScale > 3 ? 1 : newScale
@@ -82,7 +87,7 @@ const Carousel = props => {
     const zoomDefault =  {
         pinch: null,
         zoom: null,
-        smooth: true,
+        smooth: false,
         scale: 1,
         distance: 0,
         origin: {
@@ -169,7 +174,7 @@ const Carousel = props => {
         const {x, y} = calcZoomPan(state.xy[0], state.xy[1])
         setZoom({
             ...zoom,
-            smooth: null,
+            smooth: false,
             position: {
                 x, y
             }
@@ -200,7 +205,7 @@ const Carousel = props => {
                 })
             },
             onPinch: state => {
-                const pinchDistance = state.da[0] * 1.5
+                const pinchDistance = state.da[0]
                 let scale = pinchDistance / 100
                 let zoomStatus = true
                 if(scale <= 1){
@@ -275,7 +280,7 @@ const Carousel = props => {
             >
                 {renderImages(props.images)}
             </div>
-            <button 
+            {/* <button 
             className={styles.button_zoom}
             onClick={() => {
                 let newScale = zoom.scale + 1
@@ -290,7 +295,7 @@ const Carousel = props => {
                     smooth: true,
                     position
                 })
-            }}>enlarge</button>
+            }}>enlarge</button> */}
             <div
             style={{
                 position: "fixed",
