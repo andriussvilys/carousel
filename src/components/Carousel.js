@@ -77,10 +77,18 @@ const Carousel = props => {
                     ref={slidePosition.currentSlide === index ? zoomRef : null}
                     src={image.src}
                     alt={image.src}
+                    // onTouchStart={(e) => {
+                    //     console.log("TOUCH")
+                    //     e.preventDefault()
+                    // }}
+                    onTouchEnd={e => {
+                        e.preventDefault()
+                    }}
                     onMouseDown={(e) => {
+                        // e.preventDefault()
                         // console.log(e)
                         // console.log(e.touches)
-                        // console.log(e.target)
+                        // console.log(e.type)
                         // if(e.touches && e.touches.length > 0){
                         //     console.log(e.touches)
                         //     alert("touches")
