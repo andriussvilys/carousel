@@ -7,15 +7,22 @@ const Carousel = props => {
     const zoomRef = React.useRef(null)
 
     const slideTo = (index) => {
-        const newTransfrom = -((100 / props.images.length) * index)
-        let delay = zoom.zoom ? 400 : 0
+        let slideToIndex = index;
+        if(slideToIndex < 0){
+            slideToIndex = props.images.length - 1; 
+        }
+        else if(slideToIndex > props.images.length - 1){
+            slideToIndex = 0;
+        }
+        const newTransfrom = -((100 / props.images.length) * slideToIndex)
+        let delay = zoom.zoom ? 250 : 0
         if(zoom.zoom){
             setZoom({...zoomDefault})
         }
         setTimeout(() => {            
             setSlidePosition({
                 ...slidePosition,
-                currentSlide: index,
+                currentSlide: slideToIndex,
                 currentTransform: newTransfrom,
                 prevTransform: newTransfrom,
             })
@@ -35,6 +42,23 @@ const Carousel = props => {
         })
         return <ul className={styles.dotList}>{dots}</ul>
     }
+    const arrowNext = () => {
+        return <div 
+            className={styles.arrowNext}
+            onClick={() => {
+                slideTo(slidePosition.currentSlide + 1)
+            }}
+        ></div>
+    }
+    const arrowPrev = () => {
+        return <div 
+            className={styles.arrowPrev}
+            onClick={() => {
+                slideTo(slidePosition.currentSlide - 1)
+            }}
+        ></div>
+    }
+
 
     const renderImages = (data) => {
         return data.map((image, index) => {
@@ -267,6 +291,7 @@ const Carousel = props => {
                 ref={containerRef}
                 className={`${styles.container} ${zoom.pinch ? styles.showOverflow : ""}`}
             >
+            {arrowPrev()}
             <div 
                 // {...bind()}
                 id={"slideContainer"}
@@ -280,23 +305,8 @@ const Carousel = props => {
             >
                 {renderImages(props.images)}
             </div>
-            {/* <button 
-            className={styles.button_zoom}
-            onClick={() => {
-                let newScale = zoom.scale + 1
-                let newZoom = true
-                newScale = newScale > 3 ? 1 : newScale
-                newZoom = newScale === 1 ? false : true
-                const position = newScale === 1 ? {x: 0, y: 0} : zoom.position
-                setZoom({
-                    ...zoom,
-                    zoom: newZoom,
-                    scale: newScale,
-                    smooth: true,
-                    position
-                })
-            }}>enlarge</button> */}
-            <div
+            {arrowNext()}
+            {/* <div
             style={{
                 position: "fixed",
                 right: 0,
@@ -310,8 +320,7 @@ const Carousel = props => {
                 <p>zoom: {zoom.zoom ? "true" : "false"}</p>
                 <p>origin: </p>
                 <p>x: {zoom.origin.x} | y: {zoom.origin.y}</p>
-                {/* <p>x: {zoom.position.x} | y: {zoom.position.y}</p> */}
-            </div>
+            </div> */}
             {dots(props.images)}
         </div>
     )

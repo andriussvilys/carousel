@@ -21,6 +21,42 @@
     margin-top: 200px;
     // margin-left: 50px;
 }
+@mixin arrow {
+    position: absolute;
+    height: 20%;
+    top: 40%;
+    opacity: 0.18;
+    transition: opacity 0.1s;
+    z-index: 999;
+}
+@mixin arrowAfter{
+    position: absolute;
+    line-height: 20px;
+    top: calc(50% - 10px);
+    font-size: 35px;
+    cursor: pointer;
+}
+.arrowNext{
+    @include arrow;
+    right: 5px;
+}
+.arrowPrev{
+    @include arrow;
+    left: 5px;
+}
+.arrowNext:after{
+    @include arrowAfter;
+    content: "▶";
+    right: 0;
+}
+.arrowPrev:after{
+    @include arrowAfter;
+    content: "◀";
+    left: 0;
+}
+.arrowNext:hover, .arrowPrev:hover{
+    opacity: 0.5;
+}
 .slideContainer{
     top: 0;
     left: 0;
@@ -32,7 +68,7 @@
     background-color: white;
     will-change: transform;
     overflow: hidden;
-    z-index: 999;
+    z-index: 998;
 }
 .slide{
     border: 1px solid blue;
