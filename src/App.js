@@ -48,11 +48,11 @@ const App = props => {
 
   return (
     <div className="App">
-      <Carousel 
-        currentSlide={currentSlide.index}
-        initialTransform={currentSlide.initialTransform}
-        images={images}
-      />
+        <Carousel 
+          currentSlide={currentSlide.index}
+          initialTransform={currentSlide.initialTransform}
+          images={images}
+        />
       <div className="fams">
         {   
           familyList.map((family) => {

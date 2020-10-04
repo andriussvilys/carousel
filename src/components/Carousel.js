@@ -327,7 +327,9 @@ const Carousel = props => {
                 <p>origin: </p>
                 <p>x: {zoom.origin.x} | y: {zoom.origin.y}</p>
             </div> */}
-            {dots(props.images)}
+            <div className={styles.dotContainer}>
+                {dots(props.images)}
+            </div>
         </div>
     )
 }
