@@ -6,6 +6,13 @@
   overflow: visible !important;
 }
 
+.smoothSlide {
+  -webkit-transition: -webkit-transform .2s;
+  transition: -webkit-transform .2s;
+  transition: transform .2s;
+  transition: transform .2s, -webkit-transform .2s;
+}
+
 .container {
   background: yellow;
   height: 40%;
@@ -65,7 +72,6 @@
       -ms-user-select: none;
           user-select: none;
   background-color: white;
-  border: 1px solid;
   will-change: transform;
 }
 

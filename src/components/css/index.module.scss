@@ -5,7 +5,7 @@
     overflow: visible !important;
 }
 .smoothSlide {
-	// transition: transform .2s;
+	transition: transform .2s;
 }
 .container{
     background: yellow;
@@ -53,7 +53,6 @@
         cursor: zoom-in;
         user-select: none;
         background-color: white;
-        border: 1px solid;
         will-change: transform;
     }
 }
