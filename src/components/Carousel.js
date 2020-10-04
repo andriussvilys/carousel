@@ -78,7 +78,7 @@ const Carousel = props => {
                     src={image.src}
                     alt={image.src}
                     onClick={(e) => {
-                        if(e.touches){
+                        if(e.touches && e.touches.length > 0){
                             return
                         }
                         let newScale = zoom.scale + 1
