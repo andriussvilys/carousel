@@ -97,12 +97,9 @@ const Carousel = props => {
     const [zoom, setZoom] = React.useState({...zoomDefault})
 
     const moveStartHandeler = (state) => {
-        console.log("START MOVE")
     }
     const moveHandler = (state, options) => {
-        console.log("MOVE")
         if(zoom.zoom){
-            console.log("zoom")
         return}
           const containerWidth = containerRef.current.clientWidth;
           const slideCount = props.images.length
@@ -127,7 +124,6 @@ const Carousel = props => {
     }
     const moveEndHandler = (state) => {
         if(zoom.zoom){
-            console.log("zoom")
         return}
 
         var positionFix = slidePosition.currentTransform;
@@ -147,8 +143,6 @@ const Carousel = props => {
         })
     }
     const calcZoomPan = (cursorX, cursorY) => {
-
-        console.log({cursorX, cursorY})
         const container = containerRef.current
         const slideContainer = slideContainerRef.current
         const zoomedImage = zoomRef.current
@@ -169,14 +163,9 @@ const Carousel = props => {
 
         const imageWidth = zoomedImage.clientWidth * zoom.scale;
         const panX = (cursorPositionX * 100) / imageWidth
-
-        // let cursorPositionX = cursorX - offset.x
-        // const panX = ((50 / (container.clientWidth / 2)) * cursorPositionX) - 50
-
         return {x: panX, y: panY}
     }
     const zoomPanHandler = (state) => {
-        console.log({x: state.xy[0], y: state.xy[1]})
         const {x, y} = calcZoomPan(state.xy[0], state.xy[1])
         setZoom({
             ...zoom,
@@ -211,11 +200,7 @@ const Carousel = props => {
                 })
             },
             onPinch: state => {
-                // console.log(state.da[0])
-                // zoomPanHandler(state)
-                console.log("PINCH")
-                console.log(state.origin)
-                const pinchDistance = state.da[0]
+                const pinchDistance = state.da[0] * 1.5
                 let scale = pinchDistance / 100
                 let zoomStatus = true
                 if(scale <= 1){
@@ -223,7 +208,6 @@ const Carousel = props => {
                     zoomStatus = false
                 }
                 const {x, y} = calcZoomPan(state.origin[0], state.origin[1])
-                // const {x, y} = calcZoomPan(state.xy[0], state.xy[1])
                 setZoom({
                     ...zoom,
                     zoom: zoomStatus,
@@ -246,7 +230,6 @@ const Carousel = props => {
             },
             onWheel: (state) => {
                 state.event.preventDefault()
-                console.log(state.event)
                 moveHandler(state, {moveSpeed: 1.5, direction: -1})
             },
             onWheelEnd: state => {
@@ -256,18 +239,6 @@ const Carousel = props => {
                 if(!zoom.zoom || zoom.pinch)return
                 zoomPanHandler(state)
             },
-            // onMoveEnd: state => {
-            //     setZoom({
-            //         ...zoom,
-            //         smooth: true,
-            //         zoom: false,
-            //         scale: 1,
-            //         position: {
-            //             x: 0,
-            //             y: 0
-            //         }
-            //     })
-            // }
         },
         {...genericOptions},
     )
@@ -282,16 +253,10 @@ const Carousel = props => {
       }, [zoom])
 
     useEffect(() => {
-        console.log("props change")
         slideTo(props.currentSlide)
       }, [props])
 
       useEffect(bind, [bind])
-
-    // useEffect(() => {
-    //     slideTo(props.currentSlide)
-    //   }, [props])
-
     return(
             <div 
                 ref={containerRef}
