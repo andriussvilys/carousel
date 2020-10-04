@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react'
-import { useDrag, useMove, useGesture } from 'react-use-gesture'
+import { useGesture } from 'react-use-gesture'
 
 import styles from './css/index.module.scss'
 
 const Carousel = props => {
     const zoomRef = React.useRef(null)
-    const currentSlideRef = React.useRef(null)
 
     const slideTo = (index) => {
         const newTransfrom = -((100 / props.images.length) * index)
@@ -42,48 +41,31 @@ const Carousel = props => {
         return (
             <div
             className={`${styles.slide} ${zoom.pinch ? styles.showOverflow : ""} ${zoom.smooth ? styles.smoothSlide : ""}`}
-            // ref={cursorPosition.currentSlide === index ? currentSlideRef : null }
             key={`${image}-${index}`}
-            // style={{width: `${100 / props.images.length}%`}}
             style={{width: `${100 / props.images.length}%`}}
-            // style={slidePosition.currentSlide === index ? 
-            //     {width: `${100 / props.images.length}%`, 
-            //     transform: `scale(${zoom.scale})`} : 
-            //     {width: `${100 / props.images.length}%`}}
             >                    
-                {/* <div className={styles.imgContainer}> */}
-                    <img 
-                        // draggable={false}
-                        style={slidePosition.currentSlide === index ? 
-                            {transform: `scale(${zoom.scale}) translate(${zoom.position.x}%, ${zoom.position.y}%)`} : {}}
-                        // onClick={() => {
-                        //     let newScale = zoom.scale + 1
-                        //     let newZoom = true
-                        //     newScale = newScale > 3 ? 1 : newScale
-                        //     newZoom = newScale === 1 ? false : true
-                        //     setZoom({
-                        //         ...zoom,
-                        //         zoom: newZoom,
-                        //         scale: newScale,
-                        //         smooth: true
-                        //     })
-                        // }}
-                        // style={zoom.zoom ? 
-                        //     {transform: 
-                        //     `translate(${zoom.position.x}%, 
-                        //     ${zoom.position.y}%)`} 
-                        //     : {}}
-                        // style={zoom.zoom ? 
-                        //     {transform: 
-                        //     `translate(${zoom.position.x}%, 
-                        //     ${zoom.position.y}%)`} 
-                        //     : {}}
-                        className={`${zoom.smooth && slidePosition.currentSlide === index ? styles.smoothSlide : ""}`}
-                        ref={slidePosition.currentSlide === index ? zoomRef : null}
-                        src={image.src}
-                        alt={image.src}
-                    />
-                {/* </div>    */}
+                <img 
+                    style={slidePosition.currentSlide === index ? 
+                        {transform: `scale(${zoom.scale}) translate(${zoom.position.x}%, ${zoom.position.y}%)`} : {}}
+                    className={`${zoom.smooth && slidePosition.currentSlide === index ? styles.smoothSlide : ""}`}
+                    ref={slidePosition.currentSlide === index ? zoomRef : null}
+                    src={image.src}
+                    alt={image.src}
+                    onClick={() => {
+                        let newScale = zoom.scale + 1
+                        let newZoom = true
+                        newScale = newScale > 3 ? 1 : newScale
+                        newZoom = newScale === 1 ? false : true
+                        const position = newScale === 1 ? {x: 0, y: 0} : zoom.position
+                        setZoom({
+                            ...zoom,
+                            zoom: newZoom,
+                            scale: newScale,
+                            smooth: true,
+                            position
+                        })
+                    }}
+                />
             </div>
         )
         })
@@ -116,10 +98,6 @@ const Carousel = props => {
 
     const moveStartHandeler = (state) => {
         console.log("START MOVE")
-        // setSlidePosition({
-        //     ...slidePosition,
-        //     smooth: false
-        // })
     }
     const moveHandler = (state, options) => {
         console.log("MOVE")
@@ -156,16 +134,12 @@ const Carousel = props => {
         var slideCount = props.images.length;
         var slideWidth = 100 / slideCount;
         positionFix = positionFix > 0 ? 0 : positionFix
-        // var index = Math.abs(Math.round(positionFix/slideWidth))
-        // index = index > props.images.length - 1 ? props.images.length - 1 : index
         const index = slidePosition.currentSlide
 
         positionFix = (0 - (slideWidth * index))
 
         return setSlidePosition({
             ...slidePosition, 
-            // currentSlide: index,
-            // prevTransform: slidePosition.currentTransform,
             prevTransform: positionFix,
             currentTransform: positionFix,
             distance: null,
@@ -190,8 +164,14 @@ const Carousel = props => {
         let moveY = y - middleGuideY
         let panY = (moveY * marginY / middleGuideY)
 
-        let cursorPositionX = cursorX - offset.x
-        const panX = ((50 / (container.clientWidth / 2)) * cursorPositionX) - 50
+        const middleGuideX = (slideContainer.clientWidth / 2) / props.images.length
+        let cursorPositionX = (cursorX - offset.x) - middleGuideX
+
+        const imageWidth = zoomedImage.clientWidth * zoom.scale;
+        const panX = (cursorPositionX * 100) / imageWidth
+
+        // let cursorPositionX = cursorX - offset.x
+        // const panX = ((50 / (container.clientWidth / 2)) * cursorPositionX) - 50
 
         return {x: panX, y: panY}
     }
@@ -206,16 +186,6 @@ const Carousel = props => {
             }
         })
     }
-    // const zoomHandler = (state) => {
-    //     if(!zoom.zoom || zoom.pinch){
-    //         return
-    //     }
-    //     zoomPanHandler(state)
-    // }
-
-
-
-
     const genericOptions = {
         // filterTaps: true,
         domTarget: slideContainerRef,
@@ -378,6 +348,3 @@ const Carousel = props => {
 }
 
 export default Carousel
-
-
-  

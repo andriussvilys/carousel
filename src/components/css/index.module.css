@@ -76,26 +76,6 @@
   will-change: transform;
 }
 
-.slide img:after {
-  content: "";
-  height: 1px;
-  width: 1px;
-  background: red;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-}
-
-.slide:after {
-  content: "";
-  height: 100%;
-  width: 2px;
-  background: red;
-  position: absolute;
-  top: 0%;
-  left: calc(50% - 1px);
-}
-
 .imgContainer {
   width: 100%;
   display: block;
