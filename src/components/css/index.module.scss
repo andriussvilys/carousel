@@ -53,6 +53,7 @@
     top: 0;
     left: 0;
     position: absolute;
+    z-index: 998;
     height: calc(100% - 40px);
     border: 1px solid;
     display: flex;
@@ -71,17 +72,22 @@
     overflow: hidden;
     background-color: white;
     will-change: transform;
+    pointer-events: none;
+    touch-action: none;
     // cursor: ew-resize;
     img{
         position: absolute;
-        height: 100%;
+        max-height: 100%;
         max-width: 100%;
+        // height: 100%;
         // width: 100%;
         object-fit: contain;
         cursor: zoom-in;
         user-select: none;
         background-color: white;
         will-change: transform;
+        touch-action: none;
+        border: 2px solid red;
     }
 }
 .imgContainer{
@@ -109,9 +115,6 @@
 .dotList{
     margin: 0;
     padding: 0;
-    // position: absolute;
-    // bottom: 0;
-    // right: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -128,4 +131,15 @@
 }
 .dot_active{
     background: lime;
+}
+// .container{
+//     height: 80%;
+//     width: 80%;
+//     left: 20%;
+//     top: 20%;
+// }
+@media only screen and (max-width: 720px){
+    .container, .slideContainer, .slide{
+        overflow: visible;
+    }
 }
