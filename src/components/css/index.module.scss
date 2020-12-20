@@ -12,6 +12,7 @@
     width: 100%;
     position: relative;
     overflow: hidden;
+    background-color: #f6f6f6;
 }
 @mixin arrow {
     position: absolute;
@@ -55,16 +56,15 @@
     position: absolute;
     z-index: 998;
     height: calc(100% - 40px);
-    border: 1px solid;
+    // border: 1px solid;
     display: flex;
     touch-action: pan-y;
-    background-color: white;
     will-change: transform;
     overflow: hidden;
     z-index: 998;
+    box-shadow: -2px 0px 17px 4px rgba(182,182,182,0.28);
 }
 .slide{
-    border: 1px solid blue;
     position: relative;
     display: flex;
     justify-content: center;
@@ -72,22 +72,19 @@
     overflow: hidden;
     background-color: white;
     will-change: transform;
+    user-select: none;
     pointer-events: none;
     touch-action: none;
-    // cursor: ew-resize;
     img{
         position: absolute;
-        max-height: 100%;
-        max-width: 100%;
-        // height: 100%;
-        // width: 100%;
+        height: 100%;
+        width: 100%;
         object-fit: contain;
-        cursor: zoom-in;
-        user-select: none;
-        background-color: white;
         will-change: transform;
+        user-select: none;
+        pointer-events: none;
         touch-action: none;
-        border: 2px solid red;
+        z-index: 999;
     }
 }
 .imgContainer{
@@ -111,6 +108,7 @@
     background: yellow;
     position: absolute;
     bottom: 0;
+    z-index: 999;
 }
 .dotList{
     margin: 0;
@@ -138,8 +136,3 @@
 //     left: 20%;
 //     top: 20%;
 // }
-@media only screen and (max-width: 720px){
-    .container, .slideContainer, .slide{
-        overflow: visible;
-    }
-}

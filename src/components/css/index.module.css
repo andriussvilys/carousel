@@ -186,6 +186,13 @@
   background: lime;
 }
 
+.container {
+  height: 80%;
+  width: 80%;
+  left: 20%;
+  top: 20%;
+}
+
 @media only screen and (max-width: 720px) {
   .container, .slideContainer, .slide {
     overflow: visible;
