@@ -1,10 +1,48 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useGesture } from 'react-use-gesture'
 
 import styles from './css/index.module.scss'
 
 const Carousel = props => {
+    const containerRef = React.useRef()
+    const slideContainerRef = React.useRef()
     const zoomRef = React.useRef(null)
+    const [mobile, setMobile] = useState(window.document.body.getBoundingClientRect().width > 720 ? false : true)
+    function checkDocumentSize() {
+        setMobile(window.document.body.getBoundingClientRect().width > 720 ? false : true);
+    }
+    
+    window.onresize = checkDocumentSize;
+    
+    const [slidePosition, setSlidePosition] = useState({
+        smooth: true,
+        currentSlide: props.currentSlide,
+        prevTransform: props.initialTransform,
+        currentTransform: props.initialTransform
+    })
+    const zoomDefault =  {
+        pinch: null,
+        zoom: null,
+        smooth: false,
+        scale: 1,
+        distance: 0,
+        origin: {
+            x: 0,
+            y: 0
+        },
+        dotOrigin: {
+            x: 0,
+            y: 0
+        },
+        initialOrigin: null,
+        position: {
+            x: 0,
+            y: 0
+        },
+        pinchDistance: 0,
+    }
+    const [zoom, setZoom] = useState({...zoomDefault})
+    
 
     const slideTo = (index) => {
         let slideToIndex = index;
@@ -43,6 +81,7 @@ const Carousel = props => {
         return <ul className={styles.dotList}>{dots}</ul>
     }
     const arrowNext = () => {
+        if(mobile)return
         return <div 
             className={styles.arrowNext}
             onClick={() => {
@@ -51,6 +90,7 @@ const Carousel = props => {
         ></div>
     }
     const arrowPrev = () => {
+        if(mobile)return
         return <div 
             className={styles.arrowPrev}
             onClick={() => {
@@ -59,24 +99,25 @@ const Carousel = props => {
         ></div>
     }
 
-
     const renderImages = (data) => {
         return data.map((image, index) => {
         return (
             <div
+            id={`SLIDE-${index}`}
             className={`${styles.slide} ${zoom.pinch ? styles.showOverflow : ""}`}
-            // className={`${styles.slide} ${zoom.pinch ? styles.showOverflow : ""} 
-            // ${zoom.smooth ? styles.smoothSlide : ""}`}
             key={`${image}-${index}`}
             style={{width: `${100 / props.images.length}%`}}
             >                    
                 <img 
                     style={slidePosition.currentSlide === index ? 
-                        {transform: `scale(${zoom.scale}) translate(${zoom.position.x}%, ${zoom.position.y}%)`} : {}}
+                        {transform: `scale(${zoom.scale}) translate(${zoom.position.x}%, ${zoom.position.y}%)`,
+                         transformOrigin: `${zoom.origin.x}% ${zoom.origin.y}%`
+                        } : {}}
                     className={`${zoom.smooth && slidePosition.currentSlide === index ? styles.smoothSlide : ""}`}
                     ref={slidePosition.currentSlide === index ? zoomRef : null}
                     src={image.src}
                     alt={image.src}
+<<<<<<< HEAD
                     // onTouchStart={(e) => {
                     //     console.log("TOUCH")
                     //     e.preventDefault()
@@ -108,36 +149,13 @@ const Carousel = props => {
                             position
                         })
                     }}
+=======
+>>>>>>> refactor
                 />
             </div>
         )
         })
     }
-          
-    const containerRef = React.useRef()
-    const slideContainerRef = React.useRef()
-    const [slidePosition, setSlidePosition] = React.useState({
-        smooth: true,
-        currentSlide: props.currentSlide,
-        prevTransform: props.initialTransform,
-        currentTransform: props.initialTransform
-    })
-    const zoomDefault =  {
-        pinch: null,
-        zoom: null,
-        smooth: false,
-        scale: 1,
-        distance: 0,
-        origin: {
-            x: 0,
-            y: 0
-        },
-        position: {
-            x: 0,
-            y: 0
-        }
-    }
-    const [zoom, setZoom] = React.useState({...zoomDefault})
 
     const moveStartHandeler = (state) => {
     }
@@ -149,11 +167,11 @@ const Carousel = props => {
           const slideWidth = 100 / slideCount
           let  transform = slidePosition.prevTransform + ((state.movement[0] * options.direction * options.moveSpeed * 100 / containerWidth) / slideCount)
 
-        if(transform > 0){
-            transform = 0
+        if(transform > slideWidth/3){
+            return
         }
-        if(transform < -100 + slideWidth){
-            transform = -100 + slideWidth
+        if(transform < -100 + (slideWidth/3)*2){
+            return
         }
         var index = Math.abs(Math.round(transform/slideWidth))
         index = index > slideCount - 1 ? slideCount - 1 : index
@@ -185,101 +203,114 @@ const Carousel = props => {
             smooth: true
         })
     }
-    const calcZoomPan = (cursorX, cursorY) => {
-        const container = containerRef.current
-        const slideContainer = slideContainerRef.current
-        const zoomedImage = zoomRef.current
-
-        const offset = {y: container.getBoundingClientRect().y, x: container.getBoundingClientRect().x, top: container.getBoundingClientRect().top}
-
-        const imgToSlideHeightRatio = zoomedImage.clientHeight * 100 / slideContainer.clientHeight
-        
-        const visibleSectionY = imgToSlideHeightRatio / zoom.scale
-        const marginY = ((100 - visibleSectionY) / 2) + 10
-        const middleGuideY = slideContainer.clientHeight / 2
-        let y = cursorY - offset.y
-        let moveY = y - middleGuideY
-        let panY = (moveY * marginY / middleGuideY)
-
-        const middleGuideX = (slideContainer.clientWidth / 2) / props.images.length
-        let cursorPositionX = (cursorX - offset.x) - middleGuideX
-
-        const imageWidth = zoomedImage.clientWidth * zoom.scale;
-        const panX = (cursorPositionX * 100) / imageWidth
-        return {x: panX, y: panY}
-    }
     const zoomPanHandler = (state) => {
-        const {x, y} = calcZoomPan(state.xy[0], state.xy[1])
+        const {x, y} = {
+            x: zoom.origin.x + (state.delta[0]/10)*zoom.scale, 
+            y: zoom.origin.y + (state.delta[1]/10)*zoom.scale
+        }
         setZoom({
             ...zoom,
             smooth: false,
-            position: {
-                x, y
-            }
+            origin: {x, y}
         })
     }
     const genericOptions = {
-        // filterTaps: true,
         domTarget: slideContainerRef,
+        filterTaps: true,
         eventOptions: {
             passive: false
         }
-        // threshold: 10
     }
     const bind = useGesture(
         {
-            onDragStart: () => {
+            onDragStart: (state) => {
                 moveStartHandeler()
             },
             onDrag: (state) => {
                 if(state.event.touches && state.event.touches.length > 1){return}
-                moveHandler(state, {moveSpeed: 2, direction: 1})
+                if(state.tap){
+                    if(state.event.touches)return
+                    console.log(state)
+                    const targetRect = containerRef.current.getBoundingClientRect()
+                    const clientPosition = {x: state.initial[0], y: state.initial[1]}
+                    const targetOffset = {x: targetRect.x, y: targetRect.y}
+                    const imageRect = zoomRef.current.getBoundingClientRect();
+                    const imageOffset = {x: imageRect.x  - targetOffset.x, y: imageRect.y - targetOffset.y}
+                    const cursorOnImage = {
+                        x: ((clientPosition.x - targetOffset.x - imageOffset.x)*100)/imageRect.width, 
+                        y: ((clientPosition.y - targetOffset.y - imageOffset.y)*100)/imageRect.height
+                    }
+                    const dotOrigin = {
+                        x: clientPosition.x - targetOffset.x, 
+                        y: clientPosition.y - targetOffset.y
+                    }
+                    console.log({...imageOffset})
+                    const scale = zoom.scale == 1 ? 2 : 1;
+                    const zoomStatus = scale > 1 ? true : false;
+                    setZoom({...zoom, 
+                        smooth: true,
+                        origin: cursorOnImage, 
+                        dotOrigin, scale, 
+                        zoom:zoomStatus})
+                }
+                else{
+                    moveHandler(state, {moveSpeed: 2, direction: 1})
+                }
             },
             onDragEnd: (state) => moveEndHandler(state),
-            onPinchStart: state => {
-                setZoom({
-                    ...zoom,
-                    zoom: true
-                })
-            },
             onPinch: state => {
-                const pinchDistance = state.da[0]
-                let scale = pinchDistance / 100
-                let zoomStatus = true
-                if(scale <= 1){
-                    scale = 1
-                    zoomStatus = false
+                const targetRect = containerRef.current.getBoundingClientRect()
+                const currentImg = zoomRef.current.getBoundingClientRect()
+                const imgOffset = {x: currentImg.x - targetRect.x, y: currentImg.y - targetRect.y}
+
+                let dotOrigin = zoom.dotOrigin;
+
+                let initialOrigin = zoom.initialOrigin
+                dotOrigin = {
+                    x: (state.origin[0] - targetRect.x), 
+                    y: (state.origin[1] - targetRect.y),
                 }
-                const {x, y} = calcZoomPan(state.origin[0], state.origin[1])
-                setZoom({
-                    ...zoom,
-                    zoom: zoomStatus,
-                    pinch: true,
-                    distance: state.da[0],
-                    scale,
-                    origin: {
-                        x, y
-                    },
-                    position: {
-                        x, y
+                if(!zoom.initialOrigin){
+                    initialOrigin = {
+                        x: ((dotOrigin.x - imgOffset.x)*100)/currentImg.width, 
+                        y: ((dotOrigin.y - imgOffset.y)*100)/currentImg.height,
+                    };
+                    let origin = initialOrigin
+                    return setZoom({...zoom, initialOrigin, dotOrigin, origin, smooth: false})
+                }
+                else{
+                    const pinchDistance = state.da[0]
+                    let scale = pinchDistance / 100
+                    const difference = {x: dotOrigin.x - zoom.dotOrigin.x, y: dotOrigin.y - zoom.dotOrigin.y}
+                    let position = {x: 0, y: 0}
+                    position = {
+                        x: zoom.position.x + (((difference.x)*100)/currentImg.width),
+                        y: zoom.position.y + (((difference.y)*100)/currentImg.height),
                     }
-                })
+                    setZoom({...zoom, 
+                        position: position,
+                        dotOrigin,
+                        scale
+                    })
+                }
             },
             onPinchEnd: state => {
                 setZoom({...zoomDefault, smooth: true})
             },
-            onWheelStart: () => {
+            onWheelStart: state => {
                 moveStartHandeler()
             },
             onWheel: (state) => {
-                state.event.preventDefault()
+                if(state.direction[0] != 0){
+                    state.event.preventDefault()
+                }
                 moveHandler(state, {moveSpeed: 1.5, direction: -1})
             },
             onWheelEnd: state => {
                 moveEndHandler(state)
             },
             onMove: state => {
-                if(!zoom.zoom || zoom.pinch)return
+                if(!zoom.zoom)return
                 zoomPanHandler(state)
             },
         },
@@ -287,7 +318,7 @@ const Carousel = props => {
     )
 
     useEffect(() => {
-        if(zoom.pinch){
+        if(zoom.zoom){
             document.querySelector(".App").style.overflow = "hidden"
         }
         else{
@@ -302,9 +333,23 @@ const Carousel = props => {
       useEffect(bind, [bind])
     return(
             <div 
+                id="container_main"
                 ref={containerRef}
                 className={`${styles.container} ${zoom.pinch ? styles.showOverflow : ""}`}
             >
+                <div
+                    style={{
+                        height: "10px",
+                        width: "10px",
+                        borderRadius: "10px",
+                        backgroundColor: "red",
+                        position: "absolute",
+                        zIndex: 999,
+                        top: zoom.dotOrigin.y,
+                        left: zoom.dotOrigin.x
+                    }}
+                >
+                </div>
             {arrowPrev()}
             <div 
                 // {...bind()}
@@ -313,7 +358,6 @@ const Carousel = props => {
                 ref={slideContainerRef}
                 style={{
                     width: `${100 * props.images.length}%`,
-                    // transform: `translateX(${-cursorPosition.transform}%)`
                     transform: `translateX(${slidePosition.currentTransform}%)`
                 }}
             >
@@ -327,15 +371,14 @@ const Carousel = props => {
                 bottom: 0,
                 background: "white",
                 border: "2px solid",
-                padding: "15px"
+                padding: "15px",
+                zIndex: 999
             }}>
-                <p >distance: {zoom.distance}</p>
-                <p>scale: {zoom.scale}</p>
-                <p>zoom: {zoom.zoom ? "true" : "false"}</p>
-                <p>origin: </p>
-                <p>x: {zoom.origin.x} | y: {zoom.origin.y}</p>
+                <p>mobile: {mobile ? "TRUE" : "FALSE"}</p>
             </div> */}
-            {dots(props.images)}
+            <div className={styles.dotContainer}>
+                {dots(props.images)}
+            </div>
         </div>
     )
 }

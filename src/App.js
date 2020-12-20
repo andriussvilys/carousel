@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Carousel from './components/Carousel'
 import './index.css'
 
@@ -48,11 +48,11 @@ const App = props => {
 
   return (
     <div className="App">
-      <Carousel 
-        currentSlide={currentSlide.index}
-        initialTransform={currentSlide.initialTransform}
-        images={images}
-      />
+        <Carousel 
+          currentSlide={currentSlide.index}
+          initialTransform={currentSlide.initialTransform}
+          images={images}
+        />
       <div className="fams">
         {   
           familyList.map((family) => {
