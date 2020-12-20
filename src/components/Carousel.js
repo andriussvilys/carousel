@@ -303,7 +303,7 @@ const Carousel = props => {
                 ref={containerRef}
                 className={`${styles.container} ${zoom.pinch ? styles.showOverflow : ""}`}
             >
-                <div
+                {/* <div
                     style={{
                         height: "10px",
                         width: "10px",
@@ -315,7 +315,7 @@ const Carousel = props => {
                         left: zoom.dotOrigin.x
                     }}
                 >
-                </div>
+                </div> */}
             {arrowPrev()}
             <div 
                 // {...bind()}
